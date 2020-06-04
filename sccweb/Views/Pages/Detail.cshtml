@@ -1,0 +1,178 @@
+﻿@model sccweb.Models.Page
+
+@{
+    ViewBag.Title = @Html.DisplayNameFor(model => model.Title);
+    var vi = 0;
+}
+<div class="row page-item page-item-header bg-img" data-target=".image-bg">
+    <div class="col-12">
+        @if (ViewBag.Img == true)
+        {
+        <img class="image-bg" src="~/Pages/RetrieveImage/@Html.DisplayFor(model => model.Id)" alt="" width="100%" />
+        }
+        else
+        { 
+        <img class="image-bg" src="~/Content/Images/m-img-banner.jpg" alt="" width="100%" />
+        }
+        <div class="page-header page-header-title">
+            <h1>
+                @Html.DisplayFor(model => model.Title)
+            </h1>
+        </div>
+    </div>
+</div>
+<div class="row page-item page-item-bcrumbs">
+    <div class="col-12">
+        <ul class="bcrumbs">
+            <li><a href="/">Home</a></li>
+            <li><a disable>@Html.DisplayFor(model => model.Title)</a></li>
+        </ul>
+    </div>
+</div>
+<div class="row page-item page-item-content">
+    @if (ViewBag.Summary != "")
+    {
+        <div class="col-sm-3 page-content page-content-sidenav">
+            <div class="page-sidenav page-sidenav-summary">
+                @Html.DisplayTextFor(model => model.Summary)
+            </div>
+        </div>
+        <div class="col-sm-9 page-content page-content-main">
+            @if (ViewBag.Subcontent[0] != "")
+            {
+                <div class="page-main page-main-text textcontent">
+                    @Html.DisplayTextFor(model => model.Maintext)
+
+                </div>
+                <div class="page-main page-plaintext"></div>
+                <div id="pageAcc" class="accordion page-accordion">
+                    <div class="card">
+
+                        @foreach (var item in ViewBag.Subcontent)
+                        {
+                            vi++;
+                            if (vi % 2 != 0)
+                            {
+                                var dbv = vi + 1;
+                                if (vi == 1)
+                                {
+                                    <div id="ch@(vi)" class="card-header">
+                                        <h4>@item</h4>
+                                        <span class="btn-cardbody" data-toggle="collapse" data-target="#collapse@(dbv)" data-body="@(dbv)" aria-expanded="true" aria-controls="collapse@(dbv)">
+                                            <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div id="ch@(vi)" class="card-header">
+                                        <h4>@item</h4>
+                                        <span class="btn-cardbody" data-toggle="collapse" data-target="#collapse@(dbv)" data-body="@(dbv)" aria-expanded="false" aria-controls="collapse@(dbv)">
+                                            <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                var dhv = vi - 1;
+                                if (vi == 2)
+                                {
+                                    <div id="collapse@(vi)" class="collapse show collapse-body" data-header="#ch@(dhv)" data-parent="#pageAcc"><div class="card-body"></div><div class="temptext">@item</div></div>
+                                }
+                                else
+                                {
+                                    <div id="collapse@(vi)" class="collapse collapse-body" data-header="#ch@(dhv)" data-parent="#pageAcc"><div class="card-body"></div><div class="temptext">@item</div></div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="page-main page-main-text textcontent">
+                    @Html.DisplayTextFor(model => model.Maintext)
+
+                </div>
+                <div class="page-main page-plaintext"></div>
+            }
+            <div class="page-main page-action">
+                <p>
+                    @Html.ActionLink("Back to List", "Index")
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-sm-12 page-content page-content-main">
+            @if (ViewBag.Subcontent[0] != "")
+            {
+                <div class="page-main page-main-text textcontent">
+                    @Html.DisplayTextFor(model => model.Maintext)
+
+                </div>
+                <div class="page-main page-plaintext"></div>
+                <div id="pageAcc" class="accordion page-accordion">
+                    <div class="card">
+
+                        @foreach (var item in ViewBag.Subcontent)
+                        {
+                            vi++;
+                            if (vi % 2 != 0)
+                            {
+                                var dbv = vi + 1;
+                                if (vi == 1)
+                                {
+                                    <div id="ch@(vi)" class="card-header">
+                                        <h4>@item</h4>
+                                        <span class="btn-cardbody" data-toggle="collapse" data-target="#collapse@(dbv)" data-body="@(dbv)" aria-expanded="true" aria-controls="collapse@(dbv)">
+                                            <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div id="ch@(vi)" class="card-header">
+                                        <h4>@item</h4>
+                                        <span class="btn-cardbody" data-toggle="collapse" data-target="#collapse@(dbv)" data-body="@(dbv)" aria-expanded="false" aria-controls="collapse@(dbv)">
+                                            <i class="fa fa-chevron-circle-right" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                var dhv = vi - 1;
+                                if (vi == 2)
+                                {
+                                    <div id="collapse@(vi)" class="collapse show collapse-body" data-header="#ch@(dhv)" data-parent="#pageAcc"><div class="card-body"></div><div class="temptext">@item</div></div>
+                                }
+                                else
+                                {
+                                    <div id="collapse@(vi)" class="collapse collapse-body" data-header="#ch@(dhv)" data-parent="#pageAcc"><div class="card-body"></div><div class="temptext">@item</div></div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="page-main page-main-text textcontent">
+                    @Html.DisplayTextFor(model => model.Maintext)
+
+                </div>
+                <div class="page-main page-plaintext"></div>
+            }
+            <div class="page-main page-action">
+                <p>
+                    @Html.ActionLink("Back to List", "Index")
+                </p>
+            </div>
+        </div>
+    }
+
+
+</div>

@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Welcome to St. Clair County, MI</title>
+    <link href="~/Content/font-awesome.css" rel="stylesheet" />
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-datepicker.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-datepicker.standalone.css" rel="stylesheet" />
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body class="@ViewBag.Class">
+    <div class="container-fluid body-content">
+        @if (@ViewBag.PageEdit != true)
+        {
+            @RenderPage("Sidenav.cshtml")
+        }
+
+        <!-- Header -->
+        <header>
+            @if (@ViewBag.PageEdit != true)
+            {
+                if (@ViewBag.Imgbg != true)
+                {
+                    <!-- Site Brand and Social Links -->
+                    <div class="row brand-social">
+                        <div class="col-sm-4 -emp"></div>
+                        <div class="col-sm-4 -brand text-center">
+                            @Html.ActionLink("Saint Clair County Michigan", "Index", "Home", new { @class = "site-brand" })
+                        </div>
+                        <div class="col-sm-4 -social text-right">
+                            <div class="d-flex flex-row justify-content-end align-items-center">
+                                <a href="/" class="sli sli-facebook">
+                                    <i class="fa fa-facebook" aria-hidden="true"></i>
+                                </a>
+                                <a href="/" class="sli sli-instagram">
+                                    <i class="fa fa-instagram" aria-hidden="true"></i>
+                                </a>
+                                <a href="/" class="sli sli-email">
+                                    <i class="fa fa-envelope" aria-hidden="true"></i>
+                                </a>
+                                <a href="/" class="sli sli-print">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Site Brand Social Links -->
+                    <!-- Banner Image -->
+
+                    <div class="row head-banner bg-img" data-target=".image-bg">
+                        <img class="image-bg" src="~/Content/Images/m-img-banner.jpg" alt="" width="100%" />
+                    </div>
+                }
+                else
+                {
+                    <div class="row brand-social">
+                        <div class="col-sm-6">
+                            @Html.ActionLink("Saint Clair County Michigan", "Index", "Home", new { @class = "site-brand site-brand-side" })
+                        </div>
+                        <div class="col-sm-6 -social text-right">
+                            <div class="d-flex flex-row justify-content-end align-items-center">
+                                <a href="/" class="sli sli-facebook">
+                                    <i class="fa fa-facebook" aria-hidden="true"></i>
+                                </a>
+                                <a href="/" class="sli sli-instagram">
+                                    <i class="fa fa-instagram" aria-hidden="true"></i>
+                                </a>
+                                <a href="/" class="sli sli-email">
+                                    <i class="fa fa-envelope" aria-hidden="true"></i>
+                                </a>
+                                <a href="/" class="sli sli-print">
+                                    <i class="fa fa-print" aria-hidden="true"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h1 class="admin-title">Control</h1>
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        <a href="~/admin" class="btn btn-success btn-sm admin-btn-back">Back</a>
+                        <a href="~/" class="btn btn-default btn-sm admin-btn-logout">Logout</a>
+                    </div>
+                </div>
+
+            }
+
+            <!-- End Banner Image -->
+
+        </header>
+        <!-- End Header -->
+        <div class="mainbody">
+            @RenderBody()
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="row align-items-center">
+                <div class="col text-center">
+                    <a href="/" class="">
+                        <i class="fa fa-home" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="col text-center">
+                    <a href="/" class="">
+                        <i class="fa fa-map-marker" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="col text-center">
+                    @Html.ActionLink("Saint Clair County Michigan", "Index", "Home", new { @class = "site-brand" })
+                </div>
+                <div class="col text-center">
+                    <a href="/" class="">
+                        <i class="fa fa-phone" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="col text-center">
+                    <a href="/" class="">
+                        <i class="fa fa-envelope" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+        </footer>
+        <!-- End Footer -->
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <!--<script>CKEDITOR.replace('textEdit');</script>-->
+    <script src="~/Scripts/bootstrap-datepicker.js"></script>
+    <script src="~/Scripts/custom.js"></script>
+</body>
+</html>
