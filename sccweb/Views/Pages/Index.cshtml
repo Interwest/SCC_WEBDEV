@@ -1,4 +1,8 @@
 ﻿@model IEnumerable<sccweb.ViewModel.PageViewModel>
+@using PagedList;
+@using PagedList.Mvc;
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 @{
     ViewBag.Title = "All Page";
 }
@@ -6,17 +10,14 @@
 <div class="panel panel-body">
     <h2>All Pages</h2>
     <hr />
-    <p class="text-right">
-        @Html.ActionLink("Create New", "Create", "", new { @class = "btn btn-success" })
-    </p>
     <table id="dtPagination" class="table page page-main table-striped table-bordered table-sm">
         <tbody>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Title)
+                    @Html.DisplayNameFor(model => model.First().Title)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Summary)
+                    @Html.DisplayNameFor(model => model.First().Summary)
                 </th>
                 <th>
                     Image
@@ -41,7 +42,7 @@
                             <a href="@Url.Action("Edit", new { id = item.Id })" class="ai btn btn-success">
                                 <i class="fa fa-pencil" aria-hidden="true"></i>
                             </a>
-                            <a href="@Url.Action("Detail", new { id = item.Id })" class="ai btn btn-warning">
+                            <a href="@Url.Action("Detail", new { id = item.Id })" class="ai btn btn-warning" target="_blank">
                                 <i class="fa fa-eye" aria-hidden="true"></i>
                             </a>
                             <a class="ai ai-expand btn btn-primary">
@@ -59,7 +60,6 @@
                                     <th>@Html.DisplayNameFor(model => model.MetaDescription)</th>
                                     <th>@Html.DisplayNameFor(model => model.MetaKeywords)</th>
                                     <th>@Html.DisplayNameFor(model => model.PageUrl)</th>
-                                    <th>@Html.DisplayNameFor(model => model.ParentId)</th>
                                 </tr>
                                 <tr>
                                     <!--<td>@Html.DisplayFor(modelItem => item.Maintext)</td>-->
@@ -67,7 +67,6 @@
                                     <td>@Html.DisplayFor(modelItem => item.MetaDescription)</td>
                                     <td>@Html.DisplayFor(modelItem => item.MetaKeywords)</td>
                                     <td>@Html.DisplayFor(modelItem => item.PageUrl)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.ParentId)</td>
                                 </tr>
                             </table>
                         </div>
@@ -76,4 +75,5 @@
             }
         </tbody>
     </table>
+
 </div>

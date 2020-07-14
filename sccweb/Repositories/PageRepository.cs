@@ -19,6 +19,7 @@ namespace sccweb.Repositories
             {
                 Title = PageViewModel.Title,
                 Summary = PageViewModel.Summary,
+                ShowSum = PageViewModel.ShowSum,
                 Maintext = PageViewModel.Maintext,
                 Created = PageViewModel.Created,
                 MetaDescription = PageViewModel.MetaDescription,
@@ -26,11 +27,12 @@ namespace sccweb.Repositories
                 Publish = PageViewModel.Publish,
                 AuthorId = PageViewModel.AuthorId,
                 ImageId = PageViewModel.ImageId,
-                ParentId = PageViewModel.ParentId,
-                NavgroupId = PageViewModel.NavgroupId,
+                NavbarId = PageViewModel.NavbarId,
+                SidenavId = PageViewModel.SidenavId,
                 Img = PageViewModel.Img,
                 SubContent = PageViewModel.SubContent,
-                PageUrl = PageViewModel.PageUrl
+                PageUrl = PageViewModel.PageUrl,
+                menuitems = PageViewModel.menuitems
             };
             db.Pages.Add(page);
             int i = db.SaveChanges();
@@ -42,7 +44,6 @@ namespace sccweb.Repositories
             {
                 return 0;
             }
-
         }
 
         public byte[] ConvertToBytes(HttpPostedFileBase image)

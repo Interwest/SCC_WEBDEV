@@ -6,9 +6,6 @@
     <div class="panel panel-body">
         <h2>All Pdf</h2>
         <hr />
-        <p class="text-right">
-            @Html.ActionLink("Create New", "Create", "", new { @class = "btn btn-success" })
-        </p>
         <table class="table page page-main table-striped table-bordered table-sm">
             <tbody>
                 <tr>
@@ -56,12 +53,10 @@
                                     <tr>
                                         <th>@Html.DisplayNameFor(model => model.Created)</th>
                                         <th>@Html.DisplayNameFor(model => model.Author)</th>
-                                        <th>@Html.DisplayNameFor(model => model.Parent)</th>
                                     </tr>
                                     <tr>
                                         <td>@Html.DisplayFor(modelItem => item.Created)</td>
                                         <td>@Html.DisplayFor(modelItem => item.Author)</td>
-                                        <td>@Html.DisplayFor(modelItem => item.Parent)</td>
                                     </tr>
                                 </table>
                             </div>

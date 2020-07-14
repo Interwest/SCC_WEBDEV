@@ -12,6 +12,8 @@ using sccweb.Repositories;
 using sccweb.ViewModel;
 using System.Web.UI;
 using System.Text.RegularExpressions;
+using PagedList.Mvc;
+using PagedList;
 
 namespace sccweb.Controllers
 {
@@ -19,8 +21,6 @@ namespace sccweb.Controllers
     [ValidateInput(false)]
     public class PagesController : Controller
     {
-        
-        
         // GET: Pages
 
         private readonly sccwebEnt db = new sccwebEnt();
@@ -34,6 +34,7 @@ namespace sccweb.Controllers
         [HttpGet]
         public ActionResult Index()
         {
+
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PagePanelActive = "active";
@@ -43,6 +44,7 @@ namespace sccweb.Controllers
                 s.Id,
                 s.Title,
                 s.Summary,
+                s.ShowSum,
                 s.Maintext,
                 s.Created,
                 s.MetaDescription,
@@ -50,18 +52,21 @@ namespace sccweb.Controllers
                 s.Publish,
                 s.AuthorId,
                 s.ImageId,
-                s.ParentId,
-                s.NavgroupId,
+                s.NavbarId,
+                s.SidenavId,
                 s.Img,
-                s.SubContent
+                s.SubContent,
+                s.PageUrl,
+                s.menuitems
             });
 
             List<PageViewModel> pageModel = Page.Select(item => new PageViewModel()
             {
-                
+
                 Id = item.Id,
                 Title = item.Title,
                 Summary = item.Summary,
+                ShowSum = item.ShowSum,
                 Maintext = item.Maintext,
                 Created = item.Created,
                 MetaDescription = item.MetaDescription,
@@ -69,15 +74,134 @@ namespace sccweb.Controllers
                 Publish = item.Publish,
                 AuthorId = item.AuthorId,
                 ImageId = item.ImageId,
-                ParentId = item.ParentId,
-                NavgroupId = item.NavgroupId,
+                NavbarId = item.NavbarId,
+                SidenavId = item.SidenavId,
                 Img = item.Img,
-                SubContent = item.SubContent
+                PageUrl = item.PageUrl,
+                SubContent = item.SubContent,
+                menuitems = item.menuitems
             }).ToList();
-            return View(pageModel);
+
+            var MenuItems = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId
+            });
+
+            List<MenugroupViewModel> SubMenuLists = MenuItems.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId
+            }).ToList();
+
+            var PdfItems = db.Pdfs.Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.Summary,
+                s.Publish,
+                s.Img,
+                s.FileName,
+                s.NavbarId,
+                s.IsExternal,
+                s.ExLink
+            });
+
+            List<PdfViewModel> PdfItemLists = PdfItems.Select(item => new PdfViewModel()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Summary = item.Summary,
+                Publish = item.Publish,
+                Img = item.Img,
+                FileName = item.FileName,
+                NavbarId = item.NavbarId,
+                IsExternal = item.IsExternal,
+                ExLink = item.ExLink
+            }).ToList();
+
+            var ExLinkItems = db.Extlinks.Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.UrlLink,
+                s.Img,
+                s.NavbarId,
+                s.IsExternal,
+            });
+
+            List<ExtlinkViewModel> ExLinkLists = ExLinkItems.Select(item => new ExtlinkViewModel()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                UrlLink = item.UrlLink,
+                Img = item.Img,
+                NavbarId = item.NavbarId,
+                IsExternal = item.IsExternal,
+            }).ToList();
+
+            var PageItems = db.Pages.Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.Summary,
+                s.Publish,
+                s.ImageId,
+                s.Img,
+            });
+
+            List<PageViewModel> PageLists = PageItems.Select(item => new PageViewModel()
+            {
+
+                Id = item.Id,
+                Title = item.Title,
+                Summary = item.Summary,
+                Publish = item.Publish,
+                ImageId = item.ImageId,
+                Img = item.Img
+            }).ToList();
+
+            ViewBag.SubMenus = SubMenuLists;
+            ViewBag.PdfItems = PdfItemLists;
+            ViewBag.ExLinkItems = ExLinkLists;
+            ViewBag.PageItems = PageLists;
+
+            if (Session["UserId"] != null)
+            {
+                return View(pageModel);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Admin");
+            }
         }
 
         public ActionResult RetrieveImage(int id)
+        {
+            byte[] cover = GetImageFromDataBase(id);
+            if (cover != null)
+            {
+                return File(cover, "image/jpg");
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public ActionResult PageImages(int id)
         {
             byte[] cover = GetImageFromDataBase(id);
             if (cover != null)
@@ -107,7 +231,16 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PagePanelActive = "active";
-            return View();
+            PopulateMenuDropDownList();
+
+            if (Session["UserId"] != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Admin");
+            }
         }
         /// <summary>
         /// Save content and images
@@ -131,11 +264,18 @@ namespace sccweb.Controllers
             {
                 modes.Add(values[vi].Trim());
             }
-            
-            //ViewBag.Subcontent = modes;
 
             model.SubContent = Request["subcontent"];
-
+            if (Request.Form["MenuParents"].ToString() != "")
+            {
+                model.SidenavId = Convert.ToInt32(System.Web.HttpContext.Current.Request.Form["MenuParents"]);
+            }
+            else 
+            {
+                model.SidenavId = null;
+            }
+            
+            
             int i = service.UploadImageInDataBase(file, model);
             if (i == 1)
             {
@@ -148,7 +288,7 @@ namespace sccweb.Controllers
         [Route("Detail")]
         [HttpGet]
 
-        public ActionResult Detail(int? id, string pageName)
+        public ActionResult Detail(int? id, string pageName, User objUser)
         {
             ViewBag.Imgbg = true;
             ViewBag.Class = "page-item";
@@ -182,6 +322,245 @@ namespace sccweb.Controllers
                 ViewBag.Img = false;
             }
 
+            if (Session["UserId"] != null)
+            {
+                ViewBag.Userlogin = true;
+            }
+            else
+            {
+                ViewBag.Userlogin = false;
+            }
+
+            var ParentMenu = db.Menugroups.Select(s => new { 
+                s.Id,
+                s.Name,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.PageId,
+                s.PdfId,
+                s.ExtlinkId,
+                s.ModalId
+            }).Where(s => s.Id == PagesView.SidenavId && s.Id != 1 && s.Id != 2);
+
+            List<MenugroupViewModel> ParentMenuItem = ParentMenu.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            var Menus = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId
+            });
+
+            List<MenugroupViewModel> SubMenuLists = Menus.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId
+            }).ToList();
+
+            var PdfItems = db.Pdfs.Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.Summary,
+                s.Publish,
+                s.Img,
+                s.FileName,
+                s.NavbarId,
+                s.IsExternal,
+                s.ExLink
+            });
+
+            List<PdfViewModel> PdfItemLists = PdfItems.Select(item => new PdfViewModel()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Summary = item.Summary,
+                Publish = item.Publish,
+                Img = item.Img,
+                FileName = item.FileName,
+                NavbarId = item.NavbarId,
+                IsExternal = item.IsExternal,
+                ExLink = item.ExLink
+            }).ToList();
+
+            var ExLinkItems = db.Extlinks.Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.UrlLink,
+                s.Img,
+                s.NavbarId,
+                s.IsExternal,
+            });
+
+            List<ExtlinkViewModel> ExLinkLists = ExLinkItems.Select(item => new ExtlinkViewModel()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                UrlLink = item.UrlLink,
+                Img = item.Img,
+                NavbarId = item.NavbarId,
+                IsExternal = item.IsExternal,
+            }).ToList();
+
+            var MenuItems = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId
+            }).Where(s => s.ParentId == PagesView.SidenavId);
+
+            List<MenugroupViewModel> MenuitemList = MenuItems.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            var PageItems = db.Pages.Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.Summary,
+                s.Publish,
+                s.ImageId,
+                s.Img,
+            });
+
+            List<PageViewModel> PageLists = PageItems.Select(item => new PageViewModel()
+            {
+
+                Id = item.Id,
+                Title = item.Title,
+                Summary = item.Summary,
+                Publish = item.Publish,
+                ImageId = item.ImageId,
+                Img = item.Img
+            }).ToList();
+
+            var MenuItem = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.Type,
+                s.IsParent,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId
+            }).Where(s => s.PageId == PagesView.Id);
+
+            List<MenugroupViewModel> MenuNav = MenuItem.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                ParentId = item.ParentId,
+                Type = item.Type,
+                IsParent = item.IsParent,
+                PageId = item.PageId,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            ViewBag.SubMenus = SubMenuLists;
+            ViewBag.MenuItems = MenuitemList;
+            ViewBag.PdfItems = PdfItemLists;
+            ViewBag.ExLinkItems = ExLinkLists;
+            ViewBag.PageItems = PageLists;
+            ViewBag.ParentMenu = ParentMenuItem;
+            ViewBag.HasChild = false;
+            ViewBag.MenuNavItem = MenuNav;
+            ViewBag.MenuNavId = "";
+
+            var MenuNavItemId = "";
+            int MenuNavItemIdInt = 0;
+
+            foreach (var MenuNavItem in MenuNav) {
+                MenuNavItemId = MenuNavItem.Id.ToString();
+                MenuNavItemIdInt = MenuNavItem.Id;
+            }
+
+            foreach (var MenuLists in ViewBag.SubMenus) {
+                if (MenuLists.ParentId != null) {
+                    if (MenuLists.ParentId.ToString() == MenuNavItemId)
+                    {
+                        ViewBag.HasChild = true;
+                    }
+                }
+            }
+
+            var ChildItems = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.Type,
+                s.IsParent,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId
+            }).Where(s => s.ParentId == MenuNavItemIdInt);
+
+            List<MenugroupViewModel> ChildMenus = ChildItems.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                ParentId = item.ParentId,
+                Type = item.Type,
+                IsParent = item.IsParent,
+                PageId = item.PageId,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            ViewBag.ChildMenu = ChildMenus;
+            if (PagesView.Summary != null)
+            {
+                ViewBag.ShowSum = PagesView.ShowSum;
+            }
+            else {
+                ViewBag.ShowSum = 0;
+            }
+
             List<string> modes = new List<string>();
             string v = PagesView.SubContent.ToString();
             string[] values = v.Split(',');
@@ -190,6 +569,17 @@ namespace sccweb.Controllers
                 modes.Add(values[i].Trim());
             }
             ViewBag.Subcontent = modes;
+
+            if (PagesView.ShowSum != 0 && (ViewBag.HasChild == true || ParentMenu != null))
+            {
+                ViewBag.Col = "col-sm-9";
+                ViewBag.HideCol = false;
+            }
+            else
+            {
+                ViewBag.Col = "col-12";
+                ViewBag.HideCol = true;
+            }
 
             return View(PagesView);
         }
@@ -216,16 +606,32 @@ namespace sccweb.Controllers
                 ViewBag.Img = true;
             }
 
-            List<string> modes = new List<string>();
-            string v = Page.SubContent.ToString();
-            string[] values = v.Split(',');
-            for (int i = 0; i < values.Length; i++)
+            if (Page.SubContent != null)
             {
-                modes.Add(values[i].Trim());
+                List<string> modes = new List<string>();
+                string v = Page.SubContent.ToString();
+                string[] values = v.Split(',');
+                for (int i = 0; i < values.Length; i++)
+                {
+                    modes.Add(values[i].Trim());
+                }
+                ViewBag.Subcontent = modes;
             }
-            ViewBag.Subcontent = modes;
+            else 
+            {
+                ViewBag.Subcontent = null;
+            }
 
-            return View(Page);
+            PopulateMenuDropDownList(Page.SidenavId);
+
+            if (Session["UserId"] != null)
+            {
+                return View(Page);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Admin");
+            }
         }
 
         [HttpPost, ActionName("Edit")]
@@ -253,11 +659,11 @@ namespace sccweb.Controllers
 
                 Page.Img = ConvertToBytesEdit(file);
 
-                if (TryUpdateModel(Page, "", new string[] { "Title", "Summary", "Maintext", "Created", "MetaDescription", "MetaKeywords", "Publish", "AuthorId", "ImageId", "ParentId", "NavgroupId", "Img"}));
+                if (TryUpdateModel(Page, "", new string[] { "Title", "Summary", "ShowSum", "Maintext", "Created", "MetaDescription", "MetaKeywords", "Publish", "AuthorId", "ImageId", "NavbarId", "SidenavId", "Img", "menuitems"}));
             }
             else 
             {
-                if (TryUpdateModel(Page, "", new string[] { "Title", "Summary", "Maintext", "Created", "MetaDescription", "MetaKeywords", "Publish", "AuthorId", "ImageId", "ParentId", "NavgroupId" }));
+                if (TryUpdateModel(Page, "", new string[] { "Title", "Summary", "ShowSum", "Maintext", "Created", "MetaDescription", "MetaKeywords", "Publish", "AuthorId", "ImageId", "NavbarId", "SidenavId", "menuitems" }));
             }
 
             db.Entry(Page).State = EntityState.Modified;
@@ -271,9 +677,24 @@ namespace sccweb.Controllers
                 return imageBytes;
             }
 
-            Console.WriteLine("<script>alert("+ Page.SubContent + ");</script>");
-
             return RedirectToAction("Index");
+        }
+
+        private void PopulatePagesDropDownList(object selectedPage = null)
+        { 
+            var pagesQuery = from p in db.Pages
+                             orderby p.Title
+                             select p;
+            ViewBag.PageID = new SelectList(pagesQuery, "Id", "Title", selectedPage);
+        }
+
+        private void PopulateMenuDropDownList(object selectedMenu = null)
+        {
+            var menusQuery = from p in db.Menugroups
+                             where p.IsParent == 1
+                             orderby p.Name
+                             select p;
+            ViewBag.MenuParents = new SelectList(menusQuery, "Id", "Name", selectedMenu);
         }
 
         public ActionResult Delete(int? id)

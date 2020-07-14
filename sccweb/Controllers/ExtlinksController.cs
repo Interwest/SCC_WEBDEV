@@ -11,6 +11,10 @@ using sccweb.Models;
 using sccweb.Repositories;
 using sccweb.ViewModel;
 using System.Web.UI;
+using System.Text.RegularExpressions;
+using PagedList.Mvc;
+using PagedList;
+
 
 namespace sccweb.Controllers
 {
@@ -36,9 +40,9 @@ namespace sccweb.Controllers
                 s.Created,
                 s.Author,
                 s.ImageId,
-                s.Parent,
-                s.NavgroupId,
-                s.Img
+                s.NavbarId,
+                s.Img,
+                s.IsExternal
             });
 
             List<ExtlinkViewModel> ExtlinkModel = Extlink.Select(item => new ExtlinkViewModel()
@@ -49,31 +53,11 @@ namespace sccweb.Controllers
                 Created = item.Created,
                 Author = item.Author,
                 ImageId = item.ImageId,
-                Parent = item.Parent,
-                NavgroupId = item.NavgroupId,
-                Img = item.Img
+                NavbarId = item.NavbarId,
+                Img = item.Img,
+                IsExternal = item.IsExternal
             }).ToList();
             return View(ExtlinkModel);
-        }
-
-        public ActionResult RetrieveImage(int id)
-        {
-            byte[] cover = GetImageFromDataBase(id);
-            if (cover != null)
-            {
-                return File(cover, "image/jpg");
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public byte[] GetImageFromDataBase(int Id)
-        {
-            var q = from temp in db.Extlinks where temp.Id == Id select temp.Img;
-            byte[] cover = q.First();
-            return cover;
         }
 
         [HttpGet]
@@ -100,6 +84,165 @@ namespace sccweb.Controllers
                 return RedirectToAction("Index");
             }
             return View(model);
+        }
+
+        public ActionResult Edit(int? id) {
+            ViewBag.PageEdit = true;
+            ViewBag.Class = "admin";
+            ViewBag.ExtlinkPanelActive = "active";
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var ELink = db.Extlinks.Find(id);
+            if (ELink == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (ELink.Img != null)
+            {
+                ViewBag.Img = true;
+            }
+            return View(ELink);
+        }
+
+        [HttpPost, ActionName("Edit")]
+        public ActionResult EditPost(int? id, Extlink model)
+        {
+            ViewBag.PageEdit = true;
+            ViewBag.Class = "admin";
+            ViewBag.PdfPanelActive = "active";
+            HttpPostedFileBase fileImg = Request.Files["fileImg"];
+
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var UrlItem = db.Extlinks.Find(id);
+            if (UrlItem == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (fileImg != null)
+            {
+                model.Img = ConvertToBytes(fileImg);
+                if (TryUpdateModel(UrlItem, "", new string[] { "Title", "UrlLink", "Created", "Author", "ImageId", "NavbarId", "Img", "IsExternal"})) ;
+            }
+            else
+            {
+                if (TryUpdateModel(UrlItem, "", new string[] { "Title", "UrlLink", "Created", "Author", "ImageId", "NavbarId", "IsExternal", })) ;
+            }
+
+
+            db.Entry(UrlItem).State = EntityState.Modified;
+            int i = db.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        public byte[] ConvertToBytes(HttpPostedFileBase image)
+        {
+            byte[] imageBytes = null;
+            var reader = new System.IO.BinaryReader(image.InputStream);
+            imageBytes = reader.ReadBytes((int)image.ContentLength);
+            return imageBytes;
+        }
+
+        public ActionResult RetrieveImage(int id)
+        {
+            byte[] cover = GetImageFromDataBase(id);
+            if (cover != null)
+            {
+                return File(cover, "image/jpg");
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public ActionResult LinkImages(int id)
+        {
+            byte[] cover = GetImageFromDataBase(id);
+            if (cover != null)
+            {
+                return File(cover, "image/jpg");
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public ActionResult ModalImages(int id)
+        {
+            byte[] cover = GetModalImageFromDataBase(id);
+            if (cover != null)
+            {
+                return File(cover, "image/jpg");
+            }
+            else
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Id"></param>
+        public byte[] GetModalImageFromDataBase(int Id)
+        {
+            var q = from temp in db.Modals where temp.Id == Id select temp.Img;
+            byte[] cover = q.First();
+            return cover;
+        }
+
+        public byte[] GetImageFromDataBase(int Id)
+        {
+            var q = from temp in db.Extlinks where temp.Id == Id select temp.Img;
+            byte[] cover = q.First();
+            return cover;
+        }
+
+        public ActionResult Delete(int? id)
+        {
+            ViewBag.PageEdit = true;
+            ViewBag.Class = "admin";
+            ViewBag.ExtlinkPanelActive = "active";
+
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var ExtLink = db.Extlinks.Find(id);
+            if (ExtLink == null)
+            {
+                return HttpNotFound();  
+            }
+
+            return View(ExtLink);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeletePost(int id)
+        {
+
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var ExtLink = db.Extlinks.Find(id);
+            if (ExtLink == null)
+            {
+                return HttpNotFound();
+            }
+
+            db.Extlinks.Remove(ExtLink);
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
     }
 }

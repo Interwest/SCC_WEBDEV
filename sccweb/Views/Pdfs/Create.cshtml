@@ -67,8 +67,6 @@
                     <span class="pl">No</span>
                     @Html.RadioButtonFor(model => model.Publish, "0")
                 </span>
-
-
                 @Html.ValidationMessageFor(model => model.Publish, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -78,13 +76,6 @@
                 <div class="col-md-10">
                     @Html.EditorFor(model => model.Author, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.Author, "", new { @class = "text-danger" })
-                </div>
-            </div>
-            <div class="row form-group">
-                @Html.LabelFor(model => model.Parent, "Parent Page", htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.Parent, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.Parent, "", new { @class = "text-danger" })
                 </div>
             </div>
         </div>

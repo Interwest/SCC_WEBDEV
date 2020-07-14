@@ -28,10 +28,11 @@ namespace sccweb.Repositories
                 Publish = PdfViewModel.Publish,
                 Author = PdfViewModel.Author,
                 ImageId = PdfViewModel.ImageId,
-                Parent = PdfViewModel.Parent,
-                NavgroupId = PdfViewModel.NavgroupId,
+                NavbarId = PdfViewModel.NavbarId,
                 Img = PdfViewModel.Img,
-                FileName = PdfFile.FileName
+                FileName = PdfFile.FileName,
+                IsExternal = PdfViewModel.IsExternal,
+                ExLink = PdfViewModel.ExLink
             };
             db.Pdfs.Add(pdf);
             int i = db.SaveChanges();

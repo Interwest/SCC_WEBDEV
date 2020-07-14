@@ -11,6 +11,7 @@ using sccweb.Models;
 using sccweb.Repositories;
 using sccweb.ViewModel;
 using System.Web.UI;
+using System.Text.RegularExpressions;
 
 namespace sccweb.Controllers
 {
@@ -38,10 +39,11 @@ namespace sccweb.Controllers
                 s.Publish,
                 s.Author,
                 s.ImageId,
-                s.Parent,
-                s.NavgroupId,
+                s.NavbarId,
                 s.Img,
-                s.FileName
+                s.FileName,
+                s.IsExternal,
+                s.ExLink
             });
 
             List<PdfViewModel> pdfModel = Pdf.Select(item => new PdfViewModel()
@@ -53,10 +55,11 @@ namespace sccweb.Controllers
                 Publish = item.Publish,
                 Author = item.Author,
                 ImageId = item.ImageId,
-                Parent = item.Parent,
-                NavgroupId = item.NavgroupId,
+                NavbarId = item.NavbarId,
                 Img = item.Img,
-                FileName = item.FileName
+                FileName = item.FileName,
+                IsExternal = item.IsExternal,
+                ExLink = item.ExLink
             }).ToList();
             return View(pdfModel);
         }
@@ -74,6 +77,23 @@ namespace sccweb.Controllers
             }
         }
 
+        public ActionResult PdfImages(int id)
+        {
+            byte[] cover = GetImageFromDataBase(id);
+            if (cover != null)
+            {
+                return File(cover, "image/jpg");
+            }
+            else
+            {
+                return null;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
         public byte[] GetImageFromDataBase(int Id)
         {
             var q = from temp in db.Pdfs where temp.Id == Id select temp.Img;
@@ -96,12 +116,22 @@ namespace sccweb.Controllers
         {
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
-            ViewBag.PagePanelActive = "active";
+            ViewBag.PdfPanelActive = "active";
 
             var PdfFile = file.ElementAt(1);
-            var fileName = System.IO.Path.GetFileName(PdfFile.FileName);
+            var PdfFileItem = Regex.Replace(PdfFile.FileName, " ", "-");
+            var fileName = System.IO.Path.GetFileName(PdfFileItem);
             var path = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~/Content/PdfFiles/"), fileName);
             PdfFile.SaveAs(path);
+
+            if (file.ElementAt(0) != null)
+            {
+                PdfViewModel.Img = ConvertToBytes(file.ElementAt(0));
+            }
+            else {
+                PdfViewModel.Img = null;
+            }
+            
             var pdf = new Pdf
             {
                 Title = PdfViewModel.Title,
@@ -110,10 +140,11 @@ namespace sccweb.Controllers
                 Publish = PdfViewModel.Publish,
                 Author = PdfViewModel.Author,
                 ImageId = PdfViewModel.ImageId,
-                Parent = PdfViewModel.Parent,
-                NavgroupId = PdfViewModel.NavgroupId,
-                Img = ConvertToBytes(file.ElementAt(0)),
-                FileName = PdfFile.FileName
+                NavbarId = PdfViewModel.NavbarId,
+                IsExternal = PdfViewModel.IsExternal,
+                ExLink = PdfViewModel.ExLink,
+                Img = PdfViewModel.Img,
+                FileName = PdfFileItem
             };
             db.Pdfs.Add(pdf);
             int i = db.SaveChanges();
@@ -122,15 +153,128 @@ namespace sccweb.Controllers
                 return RedirectToAction("Index");
             }
             return View(PdfViewModel);
-
-
         }
+        
+
+        public ActionResult Edit(int? id)
+        {
+            ViewBag.PageEdit = true;
+            ViewBag.Class = "admin";
+            ViewBag.PdfPanelActive = "active";
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var PdfItem = db.Pdfs.Find(id);
+            if (PdfItem == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (PdfItem.Img != null)
+            {
+                ViewBag.Img = true;
+            }
+            return View(PdfItem);
+        }
+
+        [HttpPost, ActionName("Edit")]
+        public ActionResult EditPost(int? id, PdfViewModel model, MenugroupViewModel mgmodel)
+        {
+            ViewBag.PageEdit = true;
+            ViewBag.Class = "admin";
+            ViewBag.PdfPanelActive = "active";
+            HttpPostedFileBase fileImg = Request.Files["fileImg"];
+            HttpPostedFileBase filePdf = Request.Files["filePdf"];
+
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var PdfItem = db.Pdfs.Find(id);
+            var MenuItem = db.Menugroups.Where(mi => mi.PdfId == id);
+            if (PdfItem == null)
+            {
+                return HttpNotFound();
+            }
+
+            if (fileImg != null)
+            {
+                model.Img = ConvertToBytes(fileImg);
+            }
+            else
+            {
+                model.Img = null;
+            }
+
+            if (PdfItem.FileName != null)
+            {
+                var PdfFile = filePdf;
+                var PdfFileItem = Regex.Replace(PdfFile.FileName, " ", "-");
+                var fileName = System.IO.Path.GetFileName(PdfFileItem);
+                var path = System.IO.Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~/Content/PdfFiles/"), fileName);
+                PdfFile.SaveAs(path);
+
+                model.FileName = PdfFileItem;
+
+                if (TryUpdateModel(PdfItem, "", new string[] { "Title", "Summary", "Created", "Publish", "Author", "Img", "Filename", "NavbarId", "ImageId", "IsExternal", "Exlink" })) ;
+            }
+            else
+            {
+                if (TryUpdateModel(PdfItem, "", new string[] { "Title", "Summary", "Created", "Publish", "Author", "Img", "NavbarId", "ImageId", "IsExternal", "Exlink" }));
+            }
+
+            db.Entry(PdfItem).State = EntityState.Modified;
+            int i = db.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
         public byte[] ConvertToBytes(HttpPostedFileBase image)
         {
             byte[] imageBytes = null;
             var reader = new System.IO.BinaryReader(image.InputStream);
             imageBytes = reader.ReadBytes((int)image.ContentLength);
             return imageBytes;
+        }
+
+        public ActionResult Delete(int? id)
+        {
+            ViewBag.PageEdit = true;
+            ViewBag.Class = "admin";
+            ViewBag.PdfPanelActive = "active";
+
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var Pdf = db.Pdfs.Find(id);
+            if (Pdf == null)
+            {
+                return HttpNotFound();
+            }
+
+            return View(Pdf);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeletePost(int id)
+        {
+
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var Pdf = db.Pdfs.Find(id);
+            if (Pdf == null)
+            {
+                return HttpNotFound();
+            }
+
+            db.Pdfs.Remove(Pdf);
+            db.SaveChanges();
+
+            return RedirectToAction("Index");
         }
     }
 }

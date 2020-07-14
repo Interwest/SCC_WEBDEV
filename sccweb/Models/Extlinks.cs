@@ -15,8 +15,8 @@ namespace sccweb.Models
         public Nullable<System.DateTime> Created { get; set; }
         public Nullable<int> Author { get; set; }
         public Nullable<int> ImageId { get; set; }
-        public Nullable<int> Parent { get; set; }
-        public Nullable<int> NavgroupId { get; set; }
+        public Nullable<int> NavbarId { get; set; }
         public byte[] Img { get; set; }
+        public Nullable<int> IsExternal { get; set; }
     }
 }

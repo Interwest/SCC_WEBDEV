@@ -21,9 +21,9 @@ namespace sccweb.Repositories
                 Created = ExtlinkViewModel.Created,
                 Author = ExtlinkViewModel.Author,
                 ImageId = ExtlinkViewModel.ImageId,
-                Parent = ExtlinkViewModel.Parent,
-                NavgroupId = ExtlinkViewModel.NavgroupId,
-                Img = ExtlinkViewModel.Img
+                NavbarId = ExtlinkViewModel.NavbarId,
+                Img = ExtlinkViewModel.Img,
+                IsExternal = ExtlinkViewModel.IsExternal
             };
             db.Extlinks.Add(extlink);
             int i = db.SaveChanges();
