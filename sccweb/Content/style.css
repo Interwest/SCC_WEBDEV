@@ -7745,8 +7745,10 @@ header {
       .page-item-bcrumbs .bcrumbs > li {
         padding: 0 7px; } }
     .page-item-bcrumbs .bcrumbs > li:not(:last-child):after {
+      width: 2px;
+      height: 80%;
       position: absolute;
-      top: 50%;
+      top: 55%;
       right: -3px;
       bottom: auto;
       left: auto;
@@ -7755,9 +7757,9 @@ header {
       -ms-transform: translate(50%, -50%);
       -o-transform: translate(50%, -50%);
       transform: translate(50%, -50%);
-      color: #FFD966;
+      background-color: #052848;
       font-size: inherit;
-      content: '|';
+      content: "";
       display: inline-block; }
     @media (max-width: 767.98px) {
       .page-item-bcrumbs .bcrumbs > li:first-child {

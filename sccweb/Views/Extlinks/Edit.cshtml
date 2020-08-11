@@ -34,6 +34,7 @@
                                 <span class="fdi fdi-remove"><i class="fa fa-times" aria-hidden="true"></i></span>
                                 <img class="fdi fdi-img" src="~/Extlinks/RetrieveImage/@Html.DisplayFor(model => model.Id)" alt="" width="250" />
                             </div>
+                            <input type="file" id="upload" name="fileImg" onchange="fileCheck(this)" style="display:none;" />
                         }
                         else
                         {

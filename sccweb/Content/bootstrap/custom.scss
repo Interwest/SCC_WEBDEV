@@ -686,11 +686,12 @@ header {
 
                 &:not(:last-child) {
                     &:after {
-                        @include position(absolute, 50%, -3px, auto, auto);
+                        @include wh(2px, 80%);
+                        @include position(absolute, 55%, -3px, auto, auto);
                         @include transform(translate(50%, -50%));
-                        color: #FFD966;
+                        background-color: darken($primary, 20%);
                         font-size: inherit;
-                        content: '|';
+                        content: "";
                         display: inline-block;
                     }
                 }
