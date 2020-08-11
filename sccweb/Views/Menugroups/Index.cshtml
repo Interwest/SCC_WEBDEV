@@ -1128,7 +1128,7 @@
                                                 <input class="submenuparent" type="hidden" name="menuparent" value="" />
                                                 <input type="hidden" name="ModalId" value="@ViewBag.ModalId" />
 
-                                                <div id="ModalContent" class="form-horizontal form-row-custom">
+                                                <div class="form-horizontal form-row-custom">
                                                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                                                     <div class="row form-group">
                                                         @Html.LabelFor(model => model.ModalModel.Title, htmlAttributes: new { @class = "control-label col-md-3" })
@@ -1137,24 +1137,8 @@
                                                             @Html.ValidationMessageFor(model => model.ModalModel.Title, "", new { @class = "text-danger" })
                                                         </div>
                                                     </div>
-                                                    <div id="SingleModalContent" class="row form-group collapse show" data-parent="#ModalContent">
-                                                        <div class="col-md-3">
-                                                            <label class="control-label">Single Content</label>
-                                                            <button type="button" class="btn btn-default btn-sm" data-target="#TabModalContent" data-toggle="collapse" aria-expanded="false" aria-controls="TabModalContent">
-                                                                Tab Panel Content
-                                                            </button>
-                                                        </div>
-                                                        <div class="col-md-9">
-                                                            <textarea id="textEditorSingleContent" class="form-control texteditor  fmi fmi-content" name="ModalPanelContent" data-conid="1" rows="3" placeholder="Add Content"></textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div id="TabModalContent" class="row form-group collapse" data-parent="#ModalContent">
-                                                        <div class="col-md-3">
-                                                            <label class="control-label">Tab Panels</label>
-                                                            <button type="button" class="btn btn-default btn-sm" data-target="#SingleModalContent" data-toggle="collapse" aria-expanded="true" aria-controls="SingleModalContent">
-                                                                Single Content
-                                                            </button>
-                                                        </div>
+                                                    <div class="row form-group">
+                                                        <label class="control-label col-md-3">Tab Panels</label>
                                                         <div class="col-md-9">
                                                             <div id="ModalContainer">
                                                                 <div id="fmi-1" class="fm-item" data-fmitem="1">

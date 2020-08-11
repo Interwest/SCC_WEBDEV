@@ -92,126 +92,80 @@
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        @if (ModalItem.Maintext == null)
-                                                        {
-                                                            <ul>
-                                                                @foreach (var MenuList in ViewBag.SubMenus)
+                                                        <ul>
+                                                            @foreach (var MenuList in ViewBag.SubMenus)
+                                                            {
+                                                                if (ModalItem.Id == MenuList.ModalId)
                                                                 {
-                                                                    if (ModalItem.Id == MenuList.ModalId)
+                                                                    foreach (var MenuListItems in ViewBag.SubMenus)
                                                                     {
-                                                                        foreach (var MenuListItems in ViewBag.SubMenus)
+                                                                        if (MenuListItems.ParentId == MenuList.Id)
                                                                         {
-                                                                            if (MenuListItems.ParentId == MenuList.Id)
+                                                                            if (MenuListItems.Type == 1)
                                                                             {
-                                                                                if (MenuListItems.Type == 1)
+                                                                                foreach (var SubPageItem in ViewBag.PageItems)
                                                                                 {
-                                                                                    foreach (var SubPageItem in ViewBag.PageItems)
+                                                                                    if (MenuListItems.PageId == SubPageItem.Id)
                                                                                     {
-                                                                                        if (MenuListItems.PageId == SubPageItem.Id)
+                                                                                        if (SubPageItem.Publish == 1)
                                                                                         {
-                                                                                            if (SubPageItem.Publish == 1)
-                                                                                            {
-                                                                                                <li>
-                                                                                                    <a href="~/Offices/@SubPageItem.Id">
-                                                                                                        @SubPageItem.Title
-                                                                                                    </a>
-                                                                                                </li>
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                else if (MenuListItems.Type == 2)
-                                                                                {
-                                                                                    foreach (var SubPdfItem in ViewBag.PdfItems)
-                                                                                    {
-                                                                                        if (MenuListItems.PdfId == SubPdfItem.Id && SubPdfItem.Publish == 1)
-                                                                                        {
-                                                                                            int PdfExternal = 0;
-
-                                                                                            if (SubPdfItem.IsExternal != null && SubPdfItem.IsExternal == 1)
-                                                                                            {
-                                                                                                PdfExternal = SubPdfItem.IsExternal;
-                                                                                            }
-
                                                                                             <li>
-                                                                                                <a href="~/Offices/@SubPdfItem.Id" data-external="@PdfExternal">
-                                                                                                    <span>@SubPdfItem.Title</span>
+                                                                                                <a href="~/Offices/@SubPageItem.Id">
+                                                                                                    @SubPageItem.Title
                                                                                                 </a>
                                                                                             </li>
                                                                                         }
                                                                                     }
                                                                                 }
-                                                                                else if (MenuListItems.Type == 3)
+                                                                            }
+                                                                            else if (MenuListItems.Type == 2)
+                                                                            {
+                                                                                foreach (var SubPdfItem in ViewBag.PdfItems)
                                                                                 {
-                                                                                    foreach (var SubLinkItem in ViewBag.ExLinkItems)
+                                                                                    if (MenuListItems.PdfId == SubPdfItem.Id && SubPdfItem.Publish == 1)
                                                                                     {
-                                                                                        if (MenuListItems.ExtlinkId == SubLinkItem.Id)
+                                                                                        int PdfExternal = 0;
+
+                                                                                        if (SubPdfItem.IsExternal != null && SubPdfItem.IsExternal == 1)
                                                                                         {
-                                                                                            int LinkExternal = 0;
-
-                                                                                            if (SubLinkItem.IsExternal != null && SubLinkItem.IsExternal == 1)
-                                                                                            {
-                                                                                                LinkExternal = SubLinkItem.IsExternal;
-                                                                                            }
-
-                                                                                            <li>
-                                                                                                <a href="@SubLinkItem.UrlLink" data-external="@LinkExternal">
-
-                                                                                                    <span>@SubLinkItem.Title</span>
-                                                                                                </a>
-                                                                                            </li>
+                                                                                            PdfExternal = SubPdfItem.IsExternal;
                                                                                         }
+
+                                                                                        <li>
+                                                                                            <a href="~/Offices/@SubPdfItem.Id" data-external="@PdfExternal">
+                                                                                                <span>@SubPdfItem.Title</span>
+                                                                                            </a>
+                                                                                        </li>
                                                                                     }
                                                                                 }
+                                                                            }
+                                                                            else if (MenuListItems.Type == 3)
+                                                                            {
+                                                                                foreach (var SubLinkItem in ViewBag.ExLinkItems)
+                                                                                {
+                                                                                    if (MenuListItems.ExtlinkId == SubLinkItem.Id)
+                                                                                    {
+                                                                                        int LinkExternal = 0;
 
+                                                                                        if (SubLinkItem.IsExternal != null && SubLinkItem.IsExternal == 1)
+                                                                                        {
+                                                                                            LinkExternal = SubLinkItem.IsExternal;
+                                                                                        }
+
+                                                                                        <li>
+                                                                                            <a href="@SubLinkItem.UrlLink" data-external="@LinkExternal">
+
+                                                                                                <span>@SubLinkItem.Title</span>
+                                                                                            </a>
+                                                                                        </li>
+                                                                                    }
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
                                                                 }
-                                                            </ul>
-                                                        }
-                                                        else
-                                                        {
-                                                            var vi = 0;
-                                                            var ModalId = ModalItem.Title.Replace(" ", "-");
-                                                            foreach (var item in ViewBag.ModalPanel)
-                                                            {
-                                                                vi++;
-                                                                if (vi % 2 != 0)
-                                                                {
-                                                                    var dbv = vi + 1;
-                                                                    if (vi == 1)
-                                                                    {
-                                                                        <div id="Footerch@(vi)@(ModalItem.Id)" class="card-header">
-                                                                            <h4 class="btn-cardbody" data-toggle="collapse" data-target="#Footercollapse@(dbv)@(ModalItem.Id)" data-body="Footer@(dbv)@(ModalItem.Id)" aria-expanded="true" aria-controls="collapse@(dbv)">
-                                                                                @Html.Raw(System.Web.HttpUtility.HtmlDecode(item))
-                                                                            </h4>
-                                                                        </div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <div id="Footerch@(vi)@(ModalItem.Id)" class="card-header">
-                                                                            <h4 class="btn-cardbody" data-toggle="collapse" data-target="#Footercollapse@(dbv)@(ModalItem.Id)" data-body="Footer@(dbv)@(ModalItem.Id)" aria-expanded="false" aria-controls="collapse@(dbv)">
-                                                                                @Html.Raw(System.Web.HttpUtility.HtmlDecode(item))
-                                                                            </h4>
-                                                                        </div>
-                                                                    }
-                                                                }
-                                                                else
-                                                                {
-                                                                    var dhv = vi - 1;
-                                                                    if (vi == 2)
-                                                                    {
-                                                                        <div id="Footercollapse@(vi)@(ModalItem.Id)" class="collapse show collapse-body" data-header="#Footerch@(dhv)@(ModalItem.Id)" data-parent="#ModalParent@(ModalItem.Id)"><div class="card-body"></div><div class="temptext">@(item)</div></div>
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <div id="Footercollapse@(vi)@(ModalItem.Id)" class="collapse collapse-body" data-header="#Footerch@(dhv)@(ModalItem.Id)" data-parent="#ModalParent@(ModalItem.Id)"><div class="card-body"></div><div class="temptext">@(item)</div></div>
-                                                                    }
-                                                                }
                                                             }
-                                                        }
-
+                                                        </ul>
                                                     </div>
                                                 </div>
                                             </div>

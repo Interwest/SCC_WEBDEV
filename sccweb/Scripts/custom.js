@@ -132,8 +132,9 @@ $(function () {
     });
 
     $('.fi-data-img .fdi-remove').click(function () {
-        $(this).parent().siblings('#upload').show();
-        $(this).parent().remove();
+        $(this).parents('.fi-data-img').append('<input type="file" id="upload" name="upload" onchange="fileCheck(this)" />');
+        $(this).siblings('.fdi-img').remove();
+        $(this).remove();
     });
 
     $('.datepicker').datepicker({
