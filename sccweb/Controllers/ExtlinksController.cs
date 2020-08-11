@@ -112,13 +112,12 @@ namespace sccweb.Controllers
         }
 
         [HttpPost, ActionName("Edit")]
-        public ActionResult EditPost(int? id, Extlink model)
+        public ActionResult EditPost(int? id, ExtlinkViewModel model)
         {
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PdfPanelActive = "active";
             ViewBag.Footer = false;
-            HttpPostedFileBase fileImg = Request.Files["fileImg"];
 
             if (id == null)
             {
@@ -130,9 +129,11 @@ namespace sccweb.Controllers
                 return HttpNotFound();
             }
 
-            if (fileImg != null)
+            if (Request.Files["fileImg"] != null)
             {
-                model.Img = ConvertToBytes(fileImg);
+                HttpPostedFileBase file = Request.Files["fileImg"];
+
+                UrlItem.Img = ConvertToBytes(file);
                 if (TryUpdateModel(UrlItem, "", new string[] { "Title", "UrlLink", "Created", "Author", "ImageId", "NavbarId", "Img", "IsExternal"})) ;
             }
             else
@@ -144,16 +145,18 @@ namespace sccweb.Controllers
             db.Entry(UrlItem).State = EntityState.Modified;
             int i = db.SaveChanges();
 
+            byte[] ConvertToBytes(HttpPostedFileBase image)
+            {
+                byte[] imageBytes = null;
+                var reader = new System.IO.BinaryReader(image.InputStream);
+                imageBytes = reader.ReadBytes((int)image.ContentLength);
+                return imageBytes;
+            }
+
             return RedirectToAction("Index");
         }
 
-        public byte[] ConvertToBytes(HttpPostedFileBase image)
-        {
-            byte[] imageBytes = null;
-            var reader = new System.IO.BinaryReader(image.InputStream);
-            imageBytes = reader.ReadBytes((int)image.ContentLength);
-            return imageBytes;
-        }
+        
 
         public ActionResult RetrieveImage(int id)
         {
