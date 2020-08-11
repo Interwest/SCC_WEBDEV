@@ -19,6 +19,7 @@ namespace sccweb.Models
         public Nullable<int> Author { get; set; }
         public Nullable<int> ImageId { get; set; }
         public Nullable<int> NavbarId { get; set; }
+        public string Icon { get; set; }
         public byte[] Img { get; set; }
     }
 }

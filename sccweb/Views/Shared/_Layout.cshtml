@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Welcome to St. Clair County, MI</title>
     <link href="~/Content/font-awesome.css" rel="stylesheet" />
+    <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet">
     <link href="~/Content/style.css" rel="stylesheet" />
     <link href="~/Content/bootstrap-datepicker.css" rel="stylesheet" />
     <link href="~/Content/bootstrap-datepicker.standalone.css" rel="stylesheet" />
     <link href="~/Content/jquery-customselect-1.9.1.css" rel="stylesheet" />
     <link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="~/Scripts/jquery-customselect-1.9.1.js"></script>
-    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
-    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+    <link rel='shortcut icon' type='image/x-icon' href='~/Content/Images/favicon.ico' />
+
 </head>
 <body class="@ViewBag.Class">
     <div class="container-fluid body-content">
@@ -29,7 +29,7 @@
                         </button>
                     </div>
                     <div class="modal-body text-center">
-                        <a href="" class="btn btn-primary btn-sm" id="continue">Continue</a>
+                        <a href="" class="btn btn-primary btn-sm" id="continue" target="_blank">Continue</a>
                         <button id="cancel" type="button" class="btn btn-default btn-sm cancel">Cancel</button>
                     </div>
                 </div>
@@ -49,20 +49,20 @@
                     <div class="row brand-social">
                         <div class="col-sm-4 -emp"></div>
                         <div class="col-sm-4 -brand text-center">
-                            @Html.ActionLink("Saint Clair County Michigan", "Index", "Home", new { @class = "site-brand" })
+                            <a class="site-brand" href="~/">Saint Clair County Michigan</a>
                         </div>
                         <div class="col-sm-4 -social text-right">
                             <div class="d-flex flex-row justify-content-end align-items-center">
-                                <a href="/" class="sli sli-facebook">
+                                <a href="https://www.facebook.com/groups/stclaircountymi/" class="sli sli-facebook" target="_blank">
                                     <i class="fa fa-facebook" aria-hidden="true"></i>
                                 </a>
-                                <a href="/" class="sli sli-instagram">
+                                <a href="https://www.instagram.com/scchdmi/" class="sli sli-instagram" target="_blank">
                                     <i class="fa fa-instagram" aria-hidden="true"></i>
                                 </a>
-                                <a href="/" class="sli sli-email">
+                                <a href="https://www.stclaircounty.org/Main/contact.aspx?id=health" class="sli sli-email"  target="_blank">
                                     <i class="fa fa-envelope" aria-hidden="true"></i>
                                 </a>
-                                <a href="/" class="sli sli-print">
+                                <a href="~/" class="sli sli-print">
                                     <i class="fa fa-print" aria-hidden="true"></i>
                                 </a>
                             </div>
@@ -78,8 +78,8 @@
                 else
                 {
                     <div class="row brand-social">
-                        <div class="col-sm-6">
-                            @Html.ActionLink("Saint Clair County Michigan", "Index", "Home", new { @class = "site-brand site-brand-side" })
+                        <div class="col-sm-6 text-center">
+                            <a class="site-brand site-brand-side" href="~/">Saint Clair County Michigan</a>
                         </div>
                         <div class="col-sm-6 -social text-right">
                             <div class="d-flex flex-row justify-content-end align-items-center">
@@ -129,45 +129,246 @@
         </div>
 
         <!-- Footer -->
-        <footer>
-            <div class="row align-items-center">
-                <div class="col text-center">
-                    <a href="/" class="">
-                        <i class="fa fa-home" aria-hidden="true"></i>
-                    </a>
+        @if (ViewBag.Footer == true) { 
+            <footer>
+                <div class="row align-items-center">
+                    @foreach (var fItem in ViewBag.MenuFooterItems)
+                    {
+                        <div class="col text-center">
+                            @if (fItem.Type == 1)
+                            {
+                                foreach (var SubPageItem in ViewBag.PageItems)
+                                {
+                                    if (fItem.PageId == SubPageItem.Id)
+                                    {
+                                        if (SubPageItem.Publish == 1)
+                                        {
+                                            <a href="~/Offices/@SubPageItem.Id">
+                                                @SubPageItem.Title
+                                            </a>
+                                        }
+                                    }
+                                }
+                            }
+                            else if (fItem.Type == 2)
+                            {
+                                foreach (var SubPdfItem in ViewBag.PdfItems)
+                                {
+                                    if (fItem.PageId == SubPdfItem.Id)
+                                    {
+                                        if (fItem.PdfId == SubPdfItem.Id && SubPdfItem.Publish == 1)
+                                        {
+                                            int PdfExternal = 0;
+
+                                            if (SubPdfItem.IsExternal != null && SubPdfItem.IsExternal == 1)
+                                            {
+                                                PdfExternal = SubPdfItem.IsExternal;
+                                            }
+
+                                            <a href="~/Offices/@SubPdfItem.Id" data-external="@PdfExternal">
+                                                <span>@SubPdfItem.Title</span>
+                                            </a>
+                                        }
+                                    }
+                                }
+                            }
+                            else if (fItem.Type == 3)
+                            {
+                                foreach (var SubLinkItem in ViewBag.ExLinkItems)
+                                {
+                                    if (fItem.ExtlinkId == SubLinkItem.Id)
+                                    {
+                                        int LinkExternal = 0;
+                                        var LinkId = SubLinkItem.Title.Replace(" ", "");
+
+                                        if (SubLinkItem.IsExternal != null && SubLinkItem.IsExternal == 1)
+                                        {
+                                            LinkExternal = SubLinkItem.IsExternal;
+                                        }
+                                        <a id="@LinkId" class="@(SubLinkItem.Icon == null ? "bg-img" : "")" href="@(SubLinkItem.UrlLink != null ? SubLinkItem.UrlLink : "")" @(SubLinkItem.Icon == null ? "data-target=.image-bg" : "") data-external="@LinkExternal" alt="@SubLinkItem.Title">
+                                            @if (SubLinkItem.Icon != null)
+                                            {
+                                                <i class="@SubLinkItem.Icon"></i>;
+                                            }
+                                            else
+                                            {
+                                                <img class="image-bg" src="~/ExtLinks/LinkImages/@SubLinkItem.Id" width="100%" />
+                                            }
+                                        </a>
+                                    }
+                                }
+                            }
+                            else if (fItem.Type == 4)
+                            {
+                                foreach (var ModalItem in ViewBag.ModalItems)
+                                {
+                                    if (fItem.ModalId == ModalItem.Id)
+                                    {
+                                        var vi = 0;
+                                        var ModalId = ModalItem.Title.Replace(" ", "-");
+
+                                        if (ModalItem.Icon != null)
+                                        {
+                                            <a id="@ModalId" data-toggle="modal" data-target="#Modal@(ModalItem.Id)" aria-expanded="true" aria-controls="@ModalId">
+                                                <i class="@ModalItem.Icon"></i>
+                                            </a>
+                                            <div class="modal fade modaBlocks modal-footer-blocks" id="Modal@(ModalItem.Id)" tabindex="-1" role="dialog" aria-labelledby="Modal@(ModalItem.Id)" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title text-center">@ModalItem.Title</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div id="ModalParent@(ModalItem.Id)" class="accordion">
+                                                                <div class="card">
+                                                                    @foreach (var item in ViewBag.ModalPanel)
+                                                                    {
+                                                                        vi++;
+                                                                        if (vi % 2 != 0)
+                                                                        {
+                                                                            var dbv = vi + 1;
+                                                                            if (vi == 1)
+                                                                            {
+                                                                                <div id="Footerch@(vi)@(ModalItem.Id)" class="card-header">
+                                                                                    <h4 class="btn-cardbody" data-toggle="collapse" data-target="#Footercollapse@(dbv)@(ModalItem.Id)" data-body="Footer@(dbv)@(ModalItem.Id)" aria-expanded="true" aria-controls="collapse@(dbv)">
+                                                                                        @Html.Raw(System.Web.HttpUtility.HtmlDecode(item))
+                                                                                    </h4>
+                                                                                </div>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <div id="Footerch@(vi)@(ModalItem.Id)" class="card-header">
+                                                                                    <h4 class="btn-cardbody" data-toggle="collapse" data-target="#Footercollapse@(dbv)@(ModalItem.Id)" data-body="Footer@(dbv)@(ModalItem.Id)" aria-expanded="false" aria-controls="collapse@(dbv)">
+                                                                                        @Html.Raw(System.Web.HttpUtility.HtmlDecode(item))
+                                                                                    </h4>
+                                                                                </div>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            var dhv = vi - 1;
+                                                                            if (vi == 2)
+                                                                            {
+                                                                                <div id="Footercollapse@(vi)@(ModalItem.Id)" class="collapse show collapse-body" data-header="#Footerch@(dhv)@(ModalItem.Id)" data-parent="#ModalParent@(ModalItem.Id)"><div class="card-body"></div><div class="temptext">@(item)</div></div>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <div id="Footercollapse@(vi)@(ModalItem.Id)" class="collapse collapse-body" data-header="#Footerch@(dhv)@(ModalItem.Id)" data-parent="#ModalParent@(ModalItem.Id)"><div class="card-body"></div><div class="temptext">@(item)</div></div>
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-primary" data-dismiss="modal" aria-label="Close">
+                                                                Close
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            }
+                        </div>
+                    }
+
                 </div>
-                <div class="col text-center">
-                    <a href="/" class="">
-                        <i class="fa fa-map-marker" aria-hidden="true"></i>
-                    </a>
-                </div>
-                <div class="col text-center">
-                    @Html.ActionLink("Saint Clair County Michigan", "Index", "Home", new { @class = "site-brand" })
-                </div>
-                <div class="col text-center">
-                    <a href="/" class="">
-                        <i class="fa fa-phone" aria-hidden="true"></i>
-                    </a>
-                </div>
-                <div class="col text-center">
-                    <a href="/" class="">
-                        <i class="fa fa-envelope" aria-hidden="true"></i>
-                    </a>
-                </div>
-            </div>
-        </footer>
+            </footer>
+        }
+        
         <!-- End Footer -->
     </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    @*@Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")*@
     @RenderSection("scripts", required: false)
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <!--
+         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        -->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script src="~/Scripts/jquery-customselect-1.9.1.js"></script>
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+
+    @Scripts.Render("~/bundles/modernizr")
     <!--    <script>CKEDITOR.replace('textEdit');</script>-->
     <!--<script type="text/javascript" src="~/Scripts/bootstrap.bundle.min.js"></script>-->
     <script src="~/Scripts/bootstrap-datepicker.js"></script>
     <!--<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>-->
     <script src="~/Scripts/custom.js"></script>
+
+
+
+
+    <!-- Menugroups Script-->
+
+    <script>
+
+        $(document).ready(function () {
+           $('.pmg').sortable({
+               connectWith: '.pmg',
+               placeholder: 'card2',
+
+             //  handle: '.card',
+
+               update: function (e, ui) {
+
+                    var element = $(this);
+                    var id_string = element.attr("id");
+                    console.log(id_string);
+
+                    var i = 0;
+                    $('#' + id_string + '> li').each(function () {
+
+                        console.log("li: " + $(this).attr("id"));
+
+                        var li_string = $(this).attr("id");
+
+                        var del_id = li_string.split("-");
+                        var parent_id = id_string.split("-");
+
+                        var cid = del_id[1];
+                        var pid = parent_id[1];
+
+                        var info2 = 'id=' + cid + '&sortid=' + i + '&pd=' + pid;
+                        var url_sub = "@Url.Action("Sort","Menugroups")?" + info2;
+                        console.log(url_sub);
+                         $.ajax({
+                                     type: "GET",
+                                     url:  url_sub ,
+
+                                     success: function () {
+                                                 }
+                         });
+                      //  console.log("i: " +i);
+                        i++;
+
+                    });
+
+                }
+
+           });
+            $('.pmg').disableSelection();
+        });
+
+
+
+    </script>
+
+
+
+    <!-- End Menugroups Script-->
+
+
 </body>
 </html>

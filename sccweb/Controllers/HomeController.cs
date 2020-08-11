@@ -23,6 +23,8 @@ namespace sccweb.Controllers
 
         public ActionResult Index()
         {
+            ViewBag.Footer = true;
+
             var MenuItems = db.Menugroups.Select(s => new
             {
                 s.Id,
@@ -33,8 +35,9 @@ namespace sccweb.Controllers
                 s.Type,
                 s.ExtlinkId,
                 s.PdfId,
-                s.ModalId
-            });
+                s.ModalId,
+                s.SortOrder
+            }).OrderBy(s => s.SortOrder);
 
             List<MenugroupViewModel> SubMenuLists = MenuItems.Select(item => new MenugroupViewModel()
             {
@@ -83,6 +86,7 @@ namespace sccweb.Controllers
                 s.Img,
                 s.NavbarId,
                 s.IsExternal,
+                s.Icon
             });
 
             List<ExtlinkViewModel> ExLinkLists = ExLinkItems.Select(item => new ExtlinkViewModel()
@@ -93,7 +97,9 @@ namespace sccweb.Controllers
                 Img = item.Img,
                 NavbarId = item.NavbarId,
                 IsExternal = item.IsExternal,
+                Icon = item.Icon
             }).ToList();
+
             var Page = db.Pages.Select(s => new
             {
                 s.Id,
@@ -122,7 +128,8 @@ namespace sccweb.Controllers
                 s.Summary,
                 s.Maintext,
                 s.NavbarId,
-                s.Img
+                s.Img,
+                s.Icon
             });
 
             List<ModalViewModel> ModalLists = Modal.Select(item => new ModalViewModel()
@@ -132,15 +139,92 @@ namespace sccweb.Controllers
                 Summary = item.Summary,
                 Maintext = item.Maintext,
                 NavbarId = item.NavbarId,
-                Img = item.Img
+                Img = item.Img,
+                Icon = item.Icon
             }).ToList();
 
+            var MenuFooter = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.Name == "Footer");
+
+            List<MenugroupViewModel> MenuItemFooter = MenuFooter.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            int FooterParentId = 0;
+
+            foreach (var FooterParent in MenuItemFooter) {
+                FooterParentId = Convert.ToInt32(FooterParent.Id);
+            }
+
+            var FooterItems = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.ParentId == FooterParentId).OrderBy(s => s.SortOrder);
+
+            List<MenugroupViewModel> MenuFooterItems = FooterItems.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            ViewBag.MenuFooter = MenuItemFooter;
+            ViewBag.MenuFooterItems = MenuFooterItems;
+            ViewBag.ModalItems = ModalLists;
             ViewBag.SubMenus = SubMenuLists;
             ViewBag.PdfItems = PdfItemLists;
             ViewBag.ExLinkItems = ExLinkLists;
             ViewBag.PageItems = PageLists;
-            ViewBag.ModalItems = ModalLists;
+            
 
+            foreach (var ModalPanel in ModalLists) {
+                if (ModalPanel.Maintext != null) {
+                    List<string> modes = new List<string>();
+                    string v = ModalPanel.Maintext.ToString();
+                    string[] values = v.Split(',');
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        modes.Add(values[i].Trim());
+                    }
+                    ViewBag.ModalPanel = modes;
+                }
+            }
+            
             return View();
         }
 

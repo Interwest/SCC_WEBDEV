@@ -36,6 +36,7 @@ namespace sccweb.Controllers
         {
 
             ViewBag.PageEdit = true;
+            ViewBag.Footer = false;
             ViewBag.Class = "admin";
             ViewBag.PagePanelActive = "active";
 
@@ -91,8 +92,9 @@ namespace sccweb.Controllers
                 s.IsParent,
                 s.Type,
                 s.ExtlinkId,
-                s.PdfId
-            });
+                s.PdfId,
+                s.SortOrder
+            }).OrderBy(s => s.SortOrder);
 
             List<MenugroupViewModel> SubMenuLists = MenuItems.Select(item => new MenugroupViewModel()
             {
@@ -172,11 +174,111 @@ namespace sccweb.Controllers
                 ImageId = item.ImageId,
                 Img = item.Img
             }).ToList();
+            var Modal = db.Modals.Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.Summary,
+                s.Maintext,
+                s.NavbarId,
+                s.Img,
+                s.Icon
+            });
 
+            List<ModalViewModel> ModalLists = Modal.Select(item => new ModalViewModel()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Summary = item.Summary,
+                Maintext = item.Maintext,
+                NavbarId = item.NavbarId,
+                Img = item.Img,
+                Icon = item.Icon
+            }).ToList();
+
+            var MenuFooter = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.Name == "Footer");
+
+            List<MenugroupViewModel> MenuItemFooter = MenuFooter.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            int FooterParentId = 0;
+
+            foreach (var FooterParent in MenuItemFooter)
+            {
+                FooterParentId = Convert.ToInt32(FooterParent.Id);
+            }
+
+            var FooterItems = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.ParentId == FooterParentId).OrderBy(s => s.SortOrder);
+
+            List<MenugroupViewModel> MenuFooterItems = FooterItems.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            ViewBag.MenuFooter = MenuItemFooter;
+            ViewBag.MenuFooterItems = MenuFooterItems;
+            ViewBag.ModalItems = ModalLists;
             ViewBag.SubMenus = SubMenuLists;
             ViewBag.PdfItems = PdfItemLists;
             ViewBag.ExLinkItems = ExLinkLists;
             ViewBag.PageItems = PageLists;
+
+            foreach (var ModalPanel in ModalLists)
+            {
+                if (ModalPanel.Maintext != null)
+                {
+                    List<string> modes = new List<string>();
+                    string v = ModalPanel.Maintext.ToString();
+                    string[] values = v.Split(',');
+                    for (int i = 0; i < values.Length; i++)
+                    {
+                        modes.Add(values[i].Trim());
+                    }
+                    ViewBag.ModalPanel = modes;
+                }
+            }
 
             if (Session["UserId"] != null)
             {
@@ -293,6 +395,7 @@ namespace sccweb.Controllers
             ViewBag.Imgbg = true;
             ViewBag.Class = "page-item";
             ViewBag.PagePanelActive = "active";
+            ViewBag.Footer = true;
 
             if (id == null)
             {
@@ -365,8 +468,9 @@ namespace sccweb.Controllers
                 s.IsParent,
                 s.Type,
                 s.ExtlinkId,
-                s.PdfId
-            });
+                s.PdfId,
+                s.SortOrder
+            }).OrderBy(s => s.SortOrder);
 
             List<MenugroupViewModel> SubMenuLists = Menus.Select(item => new MenugroupViewModel()
             {
@@ -377,7 +481,8 @@ namespace sccweb.Controllers
                 IsParent = item.IsParent,
                 Type = item.Type,
                 ExtlinkId = item.ExtlinkId,
-                PdfId = item.PdfId
+                PdfId = item.PdfId,
+                SortOrder = item.SortOrder
             }).ToList();
 
             var PdfItems = db.Pdfs.Select(s => new
@@ -414,6 +519,7 @@ namespace sccweb.Controllers
                 s.Img,
                 s.NavbarId,
                 s.IsExternal,
+                s.Icon
             });
 
             List<ExtlinkViewModel> ExLinkLists = ExLinkItems.Select(item => new ExtlinkViewModel()
@@ -424,6 +530,7 @@ namespace sccweb.Controllers
                 Img = item.Img,
                 NavbarId = item.NavbarId,
                 IsExternal = item.IsExternal,
+                Icon = item.Icon
             }).ToList();
 
             var MenuItems = db.Menugroups.Select(s => new
@@ -436,8 +543,9 @@ namespace sccweb.Controllers
                 s.Type,
                 s.ExtlinkId,
                 s.PdfId,
-                s.ModalId
-            }).Where(s => s.ParentId == PagesView.SidenavId);
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.ParentId == PagesView.SidenavId).OrderBy(s => s.SortOrder);
 
             List<MenugroupViewModel> MenuitemList = MenuItems.Select(item => new MenugroupViewModel()
             {
@@ -483,8 +591,9 @@ namespace sccweb.Controllers
                 s.IsParent,
                 s.ExtlinkId,
                 s.PdfId,
-                s.ModalId
-            }).Where(s => s.PageId == PagesView.Id);
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.PageId == PagesView.Id).OrderBy(s => s.SortOrder);
 
             List<MenugroupViewModel> MenuNav = MenuItem.Select(item => new MenugroupViewModel()
             {
@@ -499,6 +608,92 @@ namespace sccweb.Controllers
                 ModalId = item.ModalId
             }).ToList();
 
+            var Modal = db.Modals.Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.Summary,
+                s.Maintext,
+                s.NavbarId,
+                s.Img,
+                s.Icon
+            });
+
+            List<ModalViewModel> ModalLists = Modal.Select(item => new ModalViewModel()
+            {
+                Id = item.Id,
+                Title = item.Title,
+                Summary = item.Summary,
+                Maintext = item.Maintext,
+                NavbarId = item.NavbarId,
+                Img = item.Img,
+                Icon = item.Icon
+            }).ToList();
+
+            var MenuFooter = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.Name == "Footer");
+
+            List<MenugroupViewModel> MenuItemFooter = MenuFooter.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            int FooterParentId = 0;
+
+            foreach (var FooterParent in MenuItemFooter)
+            {
+                FooterParentId = Convert.ToInt32(FooterParent.Id);
+            }
+
+            var FooterItems = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.IsParent,
+                s.Type,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.ParentId == FooterParentId).OrderBy(s => s.SortOrder);
+
+            List<MenugroupViewModel> MenuFooterItems = FooterItems.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                PageId = item.PageId,
+                ParentId = item.ParentId,
+                IsParent = item.IsParent,
+                Type = item.Type,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId
+            }).ToList();
+
+            ViewBag.MenuFooter = MenuItemFooter;
+            ViewBag.MenuFooterItems = MenuFooterItems;
+            ViewBag.ModalItems = ModalLists;
             ViewBag.SubMenus = SubMenuLists;
             ViewBag.MenuItems = MenuitemList;
             ViewBag.PdfItems = PdfItemLists;
@@ -508,6 +703,21 @@ namespace sccweb.Controllers
             ViewBag.HasChild = false;
             ViewBag.MenuNavItem = MenuNav;
             ViewBag.MenuNavId = "";
+
+            foreach (var ModalPanel in ModalLists)
+            {
+                if (ModalPanel.Maintext != null)
+                {
+                    List<string> modalmodes = new List<string>();
+                    string modalv = ModalPanel.Maintext.ToString();
+                    string[] modalvalues = modalv.Split(',');
+                    for (int i = 0; i < modalvalues.Length; i++)
+                    {
+                        modalmodes.Add(modalvalues[i].Trim());
+                    }
+                    ViewBag.ModalPanel = modalmodes;
+                }
+            }
 
             var MenuNavItemId = "";
             int MenuNavItemIdInt = 0;
@@ -522,6 +732,8 @@ namespace sccweb.Controllers
                     if (MenuLists.ParentId.ToString() == MenuNavItemId)
                     {
                         ViewBag.HasChild = true;
+
+                        break;
                     }
                 }
             }
@@ -536,8 +748,9 @@ namespace sccweb.Controllers
                 s.IsParent,
                 s.ExtlinkId,
                 s.PdfId,
-                s.ModalId
-            }).Where(s => s.ParentId == MenuNavItemIdInt);
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.ParentId == MenuNavItemIdInt).OrderBy(s => s.SortOrder);
 
             List<MenugroupViewModel> ChildMenus = ChildItems.Select(item => new MenugroupViewModel()
             {
@@ -549,8 +762,76 @@ namespace sccweb.Controllers
                 PageId = item.PageId,
                 ExtlinkId = item.ExtlinkId,
                 PdfId = item.PdfId,
-                ModalId = item.ModalId
+                ModalId = item.ModalId,
+                SortOrder = item.SortOrder
             }).ToList();
+
+            var ParentItem = db.Menugroups.Select(s => new
+            {
+                s.Id,
+                s.Name,
+                s.PageId,
+                s.ParentId,
+                s.Type,
+                s.IsParent,
+                s.ExtlinkId,
+                s.PdfId,
+                s.ModalId,
+                s.SortOrder
+            }).Where(s => s.PageId == PagesView.Id).OrderBy(s => s.SortOrder);
+
+            List<MenugroupViewModel> Parent = ParentItem.Select(item => new MenugroupViewModel()
+            {
+                Id = item.Id,
+                Name = item.Name,
+                ParentId = item.ParentId,
+                Type = item.Type,
+                IsParent = item.IsParent,
+                PageId = item.PageId,
+                ExtlinkId = item.ExtlinkId,
+                PdfId = item.PdfId,
+                ModalId = item.ModalId,
+                SortOrder = item.SortOrder
+            }).ToList();
+
+            ViewBag.Parent = Parent;
+
+            foreach (var Child in Parent) {
+                int parentId = Convert.ToInt32(Child.ParentId);
+                var stId = Child.ParentId.ToString();
+                int cmId = 0;
+                var stcmId = "";
+
+                var ChildMItems = db.Menugroups.Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    s.PageId,
+                    s.ParentId,
+                    s.Type,
+                    s.IsParent,
+                    s.ExtlinkId,
+                    s.PdfId,
+                    s.ModalId,
+                    s.SortOrder
+                }).Where(s => s.Id == parentId).OrderBy(s => s.SortOrder);
+
+                List<MenugroupViewModel> CMenuItems = ChildMItems.Select(item => new MenugroupViewModel()
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    ParentId = item.ParentId,
+                    Type = item.Type,
+                    IsParent = item.IsParent,
+                    PageId = item.PageId,
+                    ExtlinkId = item.ExtlinkId,
+                    PdfId = item.PdfId,
+                    ModalId = item.ModalId,
+                    SortOrder = item.SortOrder
+                }).ToList();
+
+                ViewData[stId] = CMenuItems;
+            }
 
             ViewBag.ChildMenu = ChildMenus;
             if (PagesView.Summary != null)
@@ -591,6 +872,7 @@ namespace sccweb.Controllers
             ViewBag.Class = "admin";
             ViewBag.PagePanelActive = "active";
             ViewBag.Img = false;
+            ViewBag.Footer = false;
 
             if (id == null)
             {
@@ -702,6 +984,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PagePanelActive = "active";
+            ViewBag.Footer = false;
 
             if (id == null)
             {

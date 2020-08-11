@@ -24,7 +24,7 @@ namespace sccweb.ViewModel
         public Nullable<int> ExtlinkId { get; set; }
         public Nullable<int> PdfId { get; set; }
         public Nullable<int> ModalId { get; set; }
-        public Nullable<int> Order { get; set; }
+        public Nullable<int> SortOrder { get; set; }
         public virtual ICollection<Page> Pages { get; set; }
         public virtual ICollection<Pdf> Pdfs { get; set; }
         public virtual ICollection<Extlink> Extlinks { get; set; }

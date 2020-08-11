@@ -788,7 +788,6 @@
     <Content Include="Scripts\addons\masonry.pkgd.min.js.map" />
     <Content Include="Scripts\addons\rating.min.js.map" />
     <Content Include="Content\bootstrap-select.css.map" />
-    <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <Content Include="Scripts\i18n\defaults-zh_TW.js.map" />
     <Content Include="Scripts\i18n\defaults-zh_CN.js.map" />
     <Content Include="Scripts\i18n\defaults-vi_VN.js.map" />
@@ -1056,10 +1055,12 @@
     <Content Include="Views\Extlinks\Delete.cshtml" />
     <Content Include="Views\Extlinks\Edit.cshtml" />
     <Content Include="Views\Pdfs\Edit.cshtml" />
+    <Content Include="Views\Menugroups\Index_orig.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\PdfFiles\" />
+    <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

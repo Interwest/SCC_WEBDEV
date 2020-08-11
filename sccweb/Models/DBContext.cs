@@ -12,7 +12,7 @@ namespace sccweb.Models
         public sccwebEnt()
             : base("name=sccwebEnt")
         {
-            Database.SetInitializer<sccwebEnt>(new DropCreateDatabaseIfModelChanges<sccwebEnt>());
+            //Database.SetInitializer<sccwebEnt>(new DropCreateDatabaseIfModelChanges<sccwebEnt>());
         }
         public DbSet<Page> Pages { get; set; }
         public DbSet<Pdf> Pdfs { get; set; }

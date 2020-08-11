@@ -29,6 +29,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PdfPanelActive = "active";
+            ViewBag.Footer = false;
 
             var Pdf = db.Pdfs.Select(s => new
             {
@@ -107,6 +108,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PdfPanelActive = "active";
+            ViewBag.Footer = false;
             return View();
         }
 
@@ -117,6 +119,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PdfPanelActive = "active";
+            ViewBag.Footer = false;
 
             var PdfFile = file.ElementAt(1);
             var PdfFileItem = Regex.Replace(PdfFile.FileName, " ", "-");
@@ -161,6 +164,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PdfPanelActive = "active";
+            ViewBag.Footer = false;
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -243,6 +247,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PdfPanelActive = "active";
+            ViewBag.Footer = false;
 
             if (id == null)
             {

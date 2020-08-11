@@ -31,6 +31,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.ExtlinkPanelActive = "active";
+            ViewBag.Footer = false;
 
             var Extlink = db.Extlinks.Select(s => new
             {
@@ -66,6 +67,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.ExtlinkPanelActive = "active";
+            ViewBag.Footer = false;
             return View();
         }
 
@@ -76,6 +78,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.ExtlinkPanelActive = "active";
+            ViewBag.Footer = false;
             HttpPostedFileBase file = Request.Files["upload"];
             ExtlinkRepository service = new ExtlinkRepository();
             int i = service.UploadImageInDataBase(file, model);
@@ -90,6 +93,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.ExtlinkPanelActive = "active";
+            ViewBag.Footer = false;
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -113,6 +117,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.PdfPanelActive = "active";
+            ViewBag.Footer = false;
             HttpPostedFileBase fileImg = Request.Files["fileImg"];
 
             if (id == null)
@@ -211,6 +216,7 @@ namespace sccweb.Controllers
             ViewBag.PageEdit = true;
             ViewBag.Class = "admin";
             ViewBag.ExtlinkPanelActive = "active";
+            ViewBag.Footer = false;
 
             if (id == null)
             {

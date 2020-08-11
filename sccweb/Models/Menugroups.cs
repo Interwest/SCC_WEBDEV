@@ -19,7 +19,7 @@ namespace sccweb.Models
         public Nullable<int> ExtlinkId { get; set; }
         public Nullable<int> PdfId { get; set; }
         public Nullable<int> ModalId { get; set; }
-        public Nullable<int> Order { get; set; }
+        public Nullable<int> SortOrder { get; set; }
         public virtual Page Pages { get; set; }
         public virtual Extlink Extlinks { get; set; }
         public virtual Pdf Pdfs { get; set; }

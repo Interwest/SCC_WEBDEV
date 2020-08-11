@@ -318,7 +318,6 @@ header {
         @include transform(translateX(0));
 
         @include media-breakpoint-down(sm) {
-            @include transform(translateX(10px));
             position: fixed;
         }
 
@@ -373,6 +372,16 @@ header {
         border: 1px solid rgba(0, 0, 0, 0.125);
         border-top: 0;
         border-radius: 0 0 5px 5px !important;
+
+        @include media-breakpoint-down(sm) {
+            font-size: 0.75rem;
+        }
+
+        p, a {
+            @include media-breakpoint-down(sm) {
+                font-size: 0.75rem;
+            }
+        }
     }
 
     h4 {
@@ -382,10 +391,10 @@ header {
     }
 
     .btn-cardbody {
-        @include position(absolute, 50%, 20px, auto, auto);
+        @include position(absolute, 50%, 12px, auto, auto);
         @include transform(translateY(-50%) rotate(0deg));
         @include transition(0.36s all);
-        font-size: 30px;
+        font-size: 24px;
         color: #5270aa;
         line-height: 0.4;
 
@@ -409,6 +418,12 @@ header {
     &-side {
         background-image: url('../Images/logo-side.png');
         border-radius: 0;
+
+        @include media-breakpoint-down(xs) {
+            margin-left: 0 !important;
+            background-image: url('../Images/logo.png');
+            display: inline-block;
+        }
     }
 }
 
@@ -453,11 +468,26 @@ header {
             .site-brand-side {
                 @include wh(345px, 100px);
                 margin-left: 80px;
+
+                @include media-breakpoint-down(sm) {
+                    width: 100%;
+                    max-width: 250px;
+                }
+
+                @include media-breakpoint-down(xs) {
+                    width: 120px;
+                    height: 120px;
+                    max-width: 200px;
+                }
             }
 
             .brand-social {
                 &:after {
                     height: 70px;
+
+                    @include media-breakpoint-down(xs) {
+                        height: 90px;
+                    }
                 }
             }
         }
@@ -481,10 +511,18 @@ header {
         padding: 15px 45px;
         background: rgba(0,0,0,0.5);
 
+        @include media-breakpoint-down(sm) {
+            padding: 10px 25px;
+        }
+
         h1 {
             color: #fff;
             font-size: 2rem;
             font-weight: 300;
+
+            @include media-breakpoint-down(sm) {
+                font-size: 1.5rem;
+            }
         }
     }
 
@@ -531,10 +569,15 @@ header {
 
                 > a {
                     padding: 10px 15px 12px;
-                    border-radius: 5px;
+                    border-radius: 5px 5px 0 0;
                     background: #f7f7f7;
                     font-weight: 700;
-                    border: 1px solid #e4e4e4;
+                    border-bottom: 1px solid #e4e4e4;
+
+                    @include media-breakpoint-down(sm) {
+                        padding: 10px 5px 12px;
+                        font-size: 0.7rem;
+                    }
                 }
 
                 &.active {
@@ -557,6 +600,10 @@ header {
             ul {
                 padding: 0 5px 0 15px;
 
+                @include media-breakpoint-down(sm) {
+                    padding: 0;
+                }
+
                 li {
                     &:first-child {
                         padding-top: 10px;
@@ -570,19 +617,54 @@ header {
                 a {
                     padding: 5px 7px 7px;
                     border-radius: 3px;
+
+                    @include media-breakpoint-down(sm) {
+                        padding-left: 5px;
+                        padding-right: 5px;
+                        font-size: 0.7rem;
+                    }
                 }
             }
         }
     }
 
+    &-item-content {
+        &.row {
+            margin-left: -5px;
+            margin-right: -5px;
+
+            @include media-breakpoint-down(sm) {
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+    }
+
     &-content {
-        padding-top: 15px;
-        padding-bottom: 20px;
+        padding: 15px 5px 20px;
+
+        @include media-breakpoint-down(sm) {
+            padding-top: 5px;
+        }
     }
 
     &-content-main {
         &:not(.col-sm-12) {
-            border-left: 1px dashed #8c8c8c;
+            //border-left: 1px dashed #8c8c8c;
+        }
+
+        .card-header {
+            padding: 12px 15px 14px;
+
+            @include media-breakpoint-down(sm) {
+                padding: 12px 10px 14px;
+            }
+
+            h4 {
+                margin: 0;
+                font-size: 0.85rem;
+                font-weight: 700;
+            }
         }
     }
 
@@ -598,20 +680,43 @@ header {
                 position: relative;
                 display: inline-block;
 
+                @include media-breakpoint-down(sm) {
+                    padding: 0 7px;
+                }
+
                 &:not(:last-child) {
                     &:after {
                         @include position(absolute, 50%, -3px, auto, auto);
                         @include transform(translate(50%, -50%));
-                        color: inherit;
+                        color: #FFD966;
                         font-size: inherit;
-                        content: '/';
+                        content: '|';
                         display: inline-block;
+                    }
+                }
+
+                &:first-child {
+                    @include media-breakpoint-down(sm) {
+                        padding-left: 0;
+                    }
+                }
+
+                &:last-child {
+                    @include media-breakpoint-down(sm) {
+                        padding-right: 0;
+                    }
+                }
+
+                > a {
+                    @include media-breakpoint-down(sm) {
+                        font-size: 0.7rem;
                     }
                 }
             }
 
             a {
                 color: $body-color;
+
 
                 &[data-toggle="modal"] {
                     cursor: pointer;
@@ -630,6 +735,10 @@ header {
                 ul {
                     padding-left: 0;
                     columns: 3;
+
+                    @include media-breakpoint-down(xs) {
+                        columns: 2;
+                    }
 
                     li {
                         list-style: none;
@@ -1073,7 +1182,11 @@ header {
     background: rgba(0,0,0,0.5);
 
     .modal-dialog {
+        @include position(absolute, 40%,auto,auto,50%);
+        @include transform(translate(-50%, -50%) !important);
+        @include transition(0.36s top !important);
         max-width: 400px;
+        margin: 0 auto;
     }
 
     .modal-content {
@@ -1101,19 +1214,27 @@ header {
 
         span {
             display: block;
+        }
+    }
+
+    &.show {
+        .modal-dialog {
+            @include position(absolute, 50%,auto,auto,50%);
         }
     }
 }
 
 .modaBlocks {
     .modal-dialog {
-        @include transform(translateY(-50%));
+        @include transform(translateY(-60%) !important);
         margin: 0 auto;
-        top: 30%;
+        top: 50%;
     }
 
     .modal-content {
         border: 0;
+
+        
     }
 
     .modal-header {
@@ -1139,6 +1260,68 @@ header {
             display: block;
         }
     }
+
+    &.modal.show {
+        .modal-dialog {
+            @include transform(translateY(-50%) !important);
+        }
+    }
+
+    &.modal-departments {
+        .modal-dialog {
+            @include media-breakpoint-down(xs) {
+                width: calc(100% - 20px);
+                max-width: unset;
+                top: 0%;
+                left: 10px;
+                right: 10px;
+                bottom: 10%;
+                position: absolute;
+                @include transform(none !important);
+                @include transition(0.36s top !important);
+            }
+        }
+
+        .modal-content {
+            @include media-breakpoint-down(xs) {
+                height: 100%;
+            }
+
+            .modal-body {
+                @include media-breakpoint-down(xs) {
+                    height: calc(100% - 60px);
+                    overflow: auto;
+                }
+            }
+        }
+
+        &.modal.show {
+            .modal-dialog {
+                @include media-breakpoint-down(xs) {
+                    top: 5%;
+                    @include transform(none !important);
+                }
+            }
+        }
+
+        .modal-body {
+            @include media-breakpoint-down(xs) {
+            }
+        }
+    }
+}
+
+.card2 {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #28a745;
+    background-clip: border-box;
+    border: 1px solid rgba(93, 123, 179, 0.13);
+    border-radius: 0.25rem;
+    height: 40px;
 }
 /* ----- END BLOCKS -----*/
 /* ----- BUTTONS -----*/
@@ -1241,6 +1424,10 @@ form {
     @include media-breakpoint-up(xl) {
         max-width: 968px;
     }
+
+    @include media-breakpoint-down(sm) {
+        border: 0;
+    }
 }
 
 .mainbody {
@@ -1338,6 +1525,10 @@ form {
             padding-left: 0;
             columns: 3;
 
+            @include media-breakpoint-down(xs) {
+                columns: 2;
+            }
+
             li {
                 list-style: none;
 
@@ -1356,6 +1547,47 @@ form {
                         background: #e9ecef;
                     }
                 }
+            }
+        }
+
+        .modal-dialog {
+            @include media-breakpoint-down(xs) {
+                width: calc(100% - 20px);
+                max-width: unset;
+                top: 0%;
+                left: 10px;
+                right: 10px;
+                bottom: 10%;
+                position: absolute;
+                @include transform(none !important);
+                @include transition(0.36s top !important);
+            }
+        }
+
+        .modal-content {
+            @include media-breakpoint-down(xs) {
+                height: 100%;
+            }
+
+            .modal-body {
+                @include media-breakpoint-down(xs) {
+                    height: calc(100% - 60px);
+                    overflow: auto;
+                }
+            }
+        }
+
+        &.modal.show {
+            .modal-dialog {
+                @include media-breakpoint-down(xs) {
+                    top: 5%;
+                    @include transform(none !important);
+                }
+            }
+        }
+
+        .modal-body {
+            @include media-breakpoint-down(xs) {
             }
         }
     }
@@ -1615,9 +1847,23 @@ footer {
         color: #fff;
         font-size: 1.6rem;
         line-height: 1;
+
+        &:hover {
+            color: #fff;
+            cursor: pointer;
+        }
+
+        &:not([href]) {
+            color: #fff;
+
+            &:hover {
+                color: #fff;
+                cursor: pointer;
+            }
+        }
     }
 
-    .site-brand {
+    #FooterLogo {
         @include wh(70px, 70px);
         margin: -5px auto;
         display: block;
@@ -1637,6 +1883,65 @@ footer {
             margin-left: -5px;
             margin-right: -5px;
         }
+    }
+}
+
+.modal-footer-blocks {
+    max-height: 90%;
+    top: 5%;
+
+    .card {
+        flex-direction: row;
+        flex-flow: row wrap;
+        border: 0;
+    }
+
+    .card-header {
+        margin: 0 !important;
+        padding: 0;
+        order: -1;
+        flex: 1;
+        border-bottom: 1px solid #c3c3c3;
+        background: transparent;
+
+        h4 {
+            margin: 0;
+            padding: 12px 10px;
+            font-size: 1rem;
+            font-weight: normal;
+            cursor: pointer;
+            border-radius: 0.3rem 0.3rem 0 0 !important;
+
+            &[aria-expanded="true"] {
+                color: #fff;
+                background: $primary;
+                pointer-events: none;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .card-body {
+        padding: 10px 0;
+    }
+
+    .collapse-body {
+        width: 100%;
+    }
+
+    .modal-dialog,
+    .modal-content {
+        height: 100%;
+    }
+
+    .modal-dialog {
+        max-width: 800px;
+        padding: 0 20px;
+    }
+
+    .modal-body {
+        height: calc(100% - 60px);
+        overflow: auto;
     }
 }
 /* ----- END FOOTER -----*/

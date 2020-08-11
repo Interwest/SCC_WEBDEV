@@ -13,8 +13,11 @@ $(document).ready(function () {
 $(function () {
     var i = 1;
     var ri = "";
+
     $('.btnAddSubPage').click(function () {
         var menuId = $(this).data('menuid'), modal = $(this).data('modalmenu');
+
+        console.log('test');
 
         $('#AddSubMenuItem').find('.submenuid').val(menuId);
         $('#AddSubMenuItem').find('.submenuparent').val(menuId);
@@ -86,6 +89,22 @@ $(function () {
             if ($(this).val() != '') {
                 $(this).val($(this).val().substring(0, textlimit));
             }
+        });
+    });
+
+    $('#SubOptModalContent input[type="submit"]').click(function (e) {
+        var textlimit = 100;
+
+        $('.texteditor:not(#Maintext)').each(function () {
+            var textEditorId = $(this).attr('id'), ckEditorData = CKEDITOR.instances[textEditorId].getData(),
+                dataReplace = ckEditorData.toString().replace(/\,/g, '&comma;');
+            CKEDITOR.instances[textEditorId].setData(dataReplace);
+        });
+
+        $('input[name="ModalPanelContent"]').each(function () {
+            var val = $(this).val(), dataReplace = val.toString().replace(/\,/g, '&comma;');
+
+            $(this).val(dataReplace);
         });
     });
 
@@ -163,6 +182,28 @@ $(function () {
         });
     });
 
+    $('#modalDuplicate').click(function () {
+        var container = $(this).data('container');
+
+        if ($(this).siblings(container).children('.fmi-sep:last-child').length == 1) {
+            var dataLength = $(this).siblings(container).children('.fmi-sep:last-child').data('length');
+
+            if (ri != "") {
+                i = ri;
+            } else {
+                i = dataLength;
+            }
+        }
+
+        i++;
+        $(container).append('<div id="fmi-' + i + '" class="fm-item" data-fmitem="' + i + '"><input data-subid="' + i + '" type="text" name="ModalPanelContent" class="form-control fmi fmi-title" placeholder="Add Subtitle"/><textarea id="textEditorModal' + i + '" class="form-control texteditor fmi fmi-content" name="ModalPanelContent" data-conid="' + i + '" row="3" placeholder="Add Subcontent"></textarea><p class="text-right" style="margin:0; margin-top: 10px;"><span class="btn btn-sm btn-danger btn-remove-fmi">Remove</span></p></div>');
+        CKEDITOR.replace('textEditorModal' + i);
+
+        $('.btn-remove-fmi').click(function () {
+            $(this).parents('.fm-item').remove();
+        });
+    });
+
     $('.btn-remove-fmisep').click(function () {
         if ($('.container').children('.fmi-sep:last-child').length == 1) {
             var dataLength = $('.container').children('.fmi-sep:last-child').data('length');
@@ -214,4 +255,21 @@ $(function () {
         $(this).attr('style', 'background-image: url(' + imgsrc + ')');
     });
     //--- End Background Image Block
+
+    $('.page-content-main a').click(function (e) {
+        var loc = $(this).attr('href'), linkDef = loc.indexOf('stclaircounty.org'), link = loc.indexOf('52.144.45.68');
+
+        if (linkDef == -1 && link == -1) {
+            e.preventDefault();
+
+            $('#modalRedirect').each(function () {
+                $(this).fadeIn("fast");
+                $(this).toggleClass('show');
+                $(this).attr('aria-hidden', false);
+                $(this).attr('aria-modal', true);
+                $(this).find('#continue').attr('target', '_blank');
+                $(this).find('#continue').attr('href', loc);
+            });
+        }
+    });
 });

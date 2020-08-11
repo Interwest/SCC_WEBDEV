@@ -1,12 +1,13 @@
 ﻿@model sccweb.Models.Page
 
 @{
-    ViewBag.Title = @Html.DisplayNameFor(model => model.Title);
+    ViewBag.Title = @Html.DisplayFor(model => model.Title);
     var modelId = @Html.DisplayFor(model => model.Id).ToString();
     int modelIdInt = Convert.ToInt32(modelId);
     var vi = 0;
     var si = 0;
     var bc = 0;
+    var hasParent = 0;
 }
 <style>
     .bcrumbs .bl:hover {
@@ -75,7 +76,7 @@
                                                                 <a id="modal-@mppitem.Id" class="bl" data-toggle="modal" data-target="#modalBlock-@mppitem.Id" aria-expanded="true" aria-controls="modal-@mppitem.Id" style="cursor: pointer">
                                                                     @mppitem.Name
                                                                 </a>
-                                                                <div class="modal fade modaBlocks" id="modalBlock-@mppitem.Id" tabindex="-1" role="dialog" aria-labelledby="modal-@mppitem.Id" aria-hidden="true">
+                                                                <div class="modal fade modaBlocks modal-departments" id="modalBlock-@mppitem.Id" tabindex="-1" role="dialog" aria-labelledby="modal-@mppitem.Id" aria-hidden="true">
                                                                     <div class="modal-dialog" role="document">
                                                                         <div class="modal-content">
                                                                             <div class="modal-header">
@@ -96,11 +97,15 @@
                                                                                                 {
                                                                                                     if (MenuListItems.PageId == SubPageItem.Id)
                                                                                                     {
-                                                                                                        <li>
-                                                                                                            <a href="~/Offices/@SubPageItem.Id">
-                                                                                                                @SubPageItem.Title
-                                                                                                            </a>
-                                                                                                        </li>
+                                                                                                        if (SubPageItem.Publish == 1)
+                                                                                                        {
+                                                                                                            <li>
+                                                                                                                <a href="~/Offices/@SubPageItem.Id">
+                                                                                                                    @SubPageItem.Title
+                                                                                                                </a>
+                                                                                                            </li>
+                                                                                                        }
+
                                                                                                     }
                                                                                                 }
                                                                                             }
@@ -187,7 +192,7 @@
                                                     <a id="modal-@mpitem.Id" class="bl" data-toggle="modal" data-target="#modalBlock-@mpitem.Id" aria-expanded="true" aria-controls="modal-@mpitem.Id" style="cursor: pointer">
                                                         @mpitem.Name
                                                     </a>
-                                                    <div class="modal fade modaBlocks" id="modalBlock-@mpitem.Id" tabindex="-1" role="dialog" aria-labelledby="modal-@mpitem.Id" aria-hidden="true">
+                                                    <div class="modal fade modaBlocks modal-departments" id="modalBlock-@mpitem.Id" tabindex="-1" role="dialog" aria-labelledby="modal-@mpitem.Id" aria-hidden="true">
                                                         <div class="modal-dialog" role="document">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
@@ -208,11 +213,14 @@
                                                                                     {
                                                                                         if (MenuListItems.PageId == SubPageItem.Id)
                                                                                         {
-                                                                                            <li>
-                                                                                                <a href="~/Offices/@SubPageItem.Id">
-                                                                                                    @SubPageItem.Title
-                                                                                                </a>
-                                                                                            </li>
+                                                                                            if (SubPageItem.Publish == 1)
+                                                                                            {
+                                                                                                <li>
+                                                                                                    <a href="~/Offices/@SubPageItem.Id">
+                                                                                                        @SubPageItem.Title
+                                                                                                    </a>
+                                                                                                </li>
+                                                                                            }
                                                                                         }
                                                                                     }
                                                                                 }
@@ -296,7 +304,7 @@
                                         <a id="modal-@item.Id" class="bl" data-toggle="modal" data-target="#modalBlock-@item.Id" aria-expanded="true" aria-controls="modal-@item.Id" style="cursor: pointer">
                                             @item.Name
                                         </a>
-                                        <div class="modal fade modaBlocks" id="modalBlock-@item.Id" tabindex="-1" role="dialog" aria-labelledby="modal-@item.Id" aria-hidden="true">
+                                        <div class="modal fade modaBlocks modal-departments" id="modalBlock-@item.Id" tabindex="-1" role="dialog" aria-labelledby="modal-@item.Id" aria-hidden="true">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -317,11 +325,14 @@
                                                                         {
                                                                             if (MenuListItems.PageId == SubPageItem.Id)
                                                                             {
-                                                                                <li>
-                                                                                    <a href="~/Offices/@SubPageItem.Id">
-                                                                                        @SubPageItem.Title
-                                                                                    </a>
-                                                                                </li>
+                                                                                if (SubPageItem.Publish == 1)
+                                                                                {
+                                                                                    <li>
+                                                                                        <a href="~/Offices/@SubPageItem.Id">
+                                                                                            @SubPageItem.Title
+                                                                                        </a>
+                                                                                    </li>
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
@@ -407,7 +418,7 @@
     </div>
 </div>
 <div class="row page-item page-item-content">
-    <div class="col-sm-3 page-content page-content-sidenav @(ViewBag.HideCol == true ? (ViewBag.HasChild == true ? "" :"hide" ) : "")">
+    <div class="col-3 page-content page-content-sidenav">
         @if (ViewBag.ShowSum != 0)
         {
             <div class="page-sidenav page-sidenav-summary">
@@ -426,9 +437,18 @@
                                 <li class="snav-items snav-items-default">
                                     @if (childitems.Type == 1)
                                     {
-                                    <li class="snav-items snav-items-default">
-                                        <a href="@childitems.PageId">@childitems.Name</a>
-                                    </li>
+                                        foreach (var SubPageItem in ViewBag.PageItems)
+                                        {
+                                            if (childitems.PageId == SubPageItem.Id)
+                                            {
+                                                if (SubPageItem.Publish == 1)
+                                                {
+                                                <li class="snav-items snav-items-default">
+                                                    <a href="@childitems.PageId">@childitems.Name</a>
+                                                </li>
+                                            }
+                                        }
+                                    }
                                 }
                                 else if (childitems.Type == 2)
                                 {
@@ -484,78 +504,187 @@
                         </li>
 
                     }
-                @foreach (var parentmenu in ViewBag.ParentMenu)
-                {
-                    if (parentmenu.ParentId != 2)
+                    else
                     {
-                        <li class="snav-item">
-                            <a>@parentmenu.Name</a>
-                            <ul>
-                                @foreach (var childitems in ViewBag.MenuItems)
+                        foreach (var parent in ViewBag.Parent)
+                        {
+                            var stId = parent.ParentId.ToString();
+
+                            foreach (var childitems in ViewData[stId])
+                            {
+                                if (childitems.Type == 1)
                                 {
-                                    if (childitems.Type == 1)
+                                    foreach (var SubPageItem in ViewBag.PageItems)
                                     {
-                                        <li class="snav-items snav-items-default">
-                                            <a href="@childitems.PageId">@childitems.Name</a>
-                                        </li>
-                                    }
-                                    else if (childitems.Type == 2)
-                                    {
-                                        foreach (var pdfitem in ViewBag.PdfItems)
+                                        if (childitems.PageId == SubPageItem.Id)
                                         {
-                                            if (childitems.PdfId == pdfitem.Id)
-                                            {
-                                                int IsExternal = 0;
-                                                if (pdfitem.IsExternal != null)
-                                                {
-                                                    if (pdfitem.IsExternal == 1)
+                                            hasParent = 1;
+                                            <li class="snav-item" data-id="@childitems.Id">
+                                                <a href="@SubPageItem.Id">@SubPageItem.Title</a>
+                                                <ul>
+                                                    @foreach (var childmItem in ViewBag.SubMenus)
                                                     {
-                                                        IsExternal = 1;
+                                                        if (childmItem.ParentId == childitems.Id)
+                                                        {
+                                                            if (childmItem.Type == 1)
+                                                            {
+                                                                foreach (var sPageItem in ViewBag.PageItems)
+                                                                {
+                                                                    if (childmItem.PageId == sPageItem.Id)
+                                                                    {
+                                                                        if (sPageItem.Publish == 1)
+                                                                        {
+                                                                            <li class="snav-items snav-items-default">
+                                                                                <a href="@sPageItem.Id">@sPageItem.Title</a>
+                                                                            </li>
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            else if (childmItem.Type == 2)
+                                                            {
+                                                                foreach (var spdfitem in ViewBag.PdfItems)
+                                                                {
+                                                                    if (childmItem.PdfId == spdfitem.Id)
+                                                                    {
+                                                                        int IsExternal = 0;
+                                                                        if (spdfitem.IsExternal != null)
+                                                                        {
+                                                                            if (spdfitem.IsExternal == 1)
+                                                                            {
+                                                                                IsExternal = 1;
+                                                                            }
+                                                                        }
+                                                                        <li class="snav-items snav-items-default">
+                                                                            @if (spdfitem.FileName != null)
+                                                                            {
+                                                                                <a href="~/Content/PdfFiles/@(spdfitem.FileName)" data-external="@IsExternal" target="_blank">@spdfitem.Title</a>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <a href="@spdfitem.ExLink" data-external="@IsExternal" target="_blank">@spdfitem.Title</a>
+                                                                            }
+                                                                        </li>
+                                                                    }
+                                                                }
+                                                            }
+                                                            else if (childmItem.Type == 3)
+                                                            {
+                                                                foreach (var slinkitem in ViewBag.ExLinkItems)
+                                                                {
+                                                                    if (childmItem.ExtlinkId == slinkitem.Id)
+                                                                    {
+                                                                        int IsExternal = 0;
+                                                                        if (slinkitem.IsExternal != null)
+                                                                        {
+                                                                            if (slinkitem.IsExternal == 1)
+                                                                            {
+                                                                                IsExternal = 1;
+                                                                            }
+                                                                        }
+                                                                        <li class="snav-items snav-items-default">
+                                                                            <a href="@slinkitem.UrlLink" data-external="@IsExternal" target="_blank">@slinkitem.Title</a>
+                                                                        </li>
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
                                                     }
-                                                }
-                                                <li class="snav-items snav-items-default">
-                                                    @if (pdfitem.FileName != null)
-                                                    {
-                                                        <a href="~/Content/PdfFiles/@(pdfitem.FileName)" data-external="@IsExternal" target="_blank">@pdfitem.Title</a>
-                                                    }
-                                                    else
-                                                    {
-                                                        <a href="@pdfitem.ExLink" data-external="@IsExternal" target="_blank">@pdfitem.Title</a>
-                                                    }
-                                                </li>
-                                            }
-                                        }
-                                    }
-                                    else if (childitems.Type == 3)
-                                    {
-                                        foreach (var linkitem in ViewBag.ExLinkItems)
-                                        {
-                                            if (childitems.ExtlinkId == linkitem.Id)
-                                            {
-                                                int IsExternal = 0;
-                                                if (linkitem.IsExternal != null)
-                                                {
-                                                    if (linkitem.IsExternal == 1)
-                                                    {
-                                                        IsExternal = 1;
-                                                    }
-                                                }
-                                                <li class="snav-items snav-items-default">
-                                                    <a href="@linkitem.UrlLink" data-external="@IsExternal" target="_blank">@linkitem.Title</a>
-                                                </li>
-                                            }
+                                                </ul>
+                                            </li>
                                         }
                                     }
                                 }
-                            </ul>
-                        </li>
+                            }
+                        }
+
+                        if (hasParent == 0)
+                        {
+                            foreach (var parentmenu in ViewBag.ParentMenu)
+                            {
+                                if (parentmenu.ParentId != 2)
+                                {
+                                    <li class="snav-item">
+                                        <a class="test">@parentmenu.Name</a>
+                                        <ul>
+                                            @foreach (var childitems in ViewBag.MenuItems)
+                                            {
+                                                if (childitems.Type == 1)
+                                                {
+                                                    foreach (var SubPageItem in ViewBag.PageItems)
+                                                    {
+                                                        if (childitems.PageId == SubPageItem.Id)
+                                                        {
+                                                            if (SubPageItem.Publish == 1)
+                                                            {
+                                                                <li class="snav-items snav-items-default">
+                                                                    <a href="@childitems.PageId">@childitems.Name</a>
+                                                                </li>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else if (childitems.Type == 2)
+                                                {
+                                                    foreach (var pdfitem in ViewBag.PdfItems)
+                                                    {
+                                                        if (childitems.PdfId == pdfitem.Id)
+                                                        {
+                                                            int IsExternal = 0;
+                                                            if (pdfitem.IsExternal != null)
+                                                            {
+                                                                if (pdfitem.IsExternal == 1)
+                                                                {
+                                                                    IsExternal = 1;
+                                                                }
+                                                            }
+                                                            <li class="snav-items snav-items-default">
+                                                                @if (pdfitem.FileName != null)
+                                                                {
+                                                                    <a href="~/Content/PdfFiles/@(pdfitem.FileName)" data-external="@IsExternal" target="_blank">@pdfitem.Title</a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a href="@pdfitem.ExLink" data-external="@IsExternal" target="_blank">@pdfitem.Title</a>
+                                                                }
+                                                            </li>
+                                                        }
+                                                    }
+                                                }
+                                                else if (childitems.Type == 3)
+                                                {
+                                                    foreach (var linkitem in ViewBag.ExLinkItems)
+                                                    {
+                                                        if (childitems.ExtlinkId == linkitem.Id)
+                                                        {
+                                                            int IsExternal = 0;
+                                                            if (linkitem.IsExternal != null)
+                                                            {
+                                                                if (linkitem.IsExternal == 1)
+                                                                {
+                                                                    IsExternal = 1;
+                                                                }
+                                                            }
+                                                            <li class="snav-items snav-items-default">
+                                                                <a href="@linkitem.UrlLink" data-external="@IsExternal" target="_blank">@linkitem.Title</a>
+                                                            </li>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        </ul>
+                                    </li>
+
+                                }
+
+                            }
+                        }
                     }
 
-                }
                 </ul>
             </div>
         </div>
-        <div class="@(ViewBag.HasChild == true ? "col-sm-9" :ViewBag.Col ) page-content page-content-main">
+        <div class="col-9 page-content page-content-main">
             @if (ViewBag.Subcontent[0] != "")
             {
                 <div class="page-main page-main-text textcontent">
